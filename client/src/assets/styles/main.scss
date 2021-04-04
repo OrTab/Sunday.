@@ -1,0 +1,40 @@
+// Setup
+@import "setup/variables.scss";
+@import "setup/functions.scss";
+@import "setup/mixins.scss";
+@import "setup/typography.scss";
+
+// Basics
+@import "basics/helpers.scss";
+@import "basics/layout.scss";
+@import "basics/base.scss";
+@import "basics/buttons.scss";
+@import "basics/animations.scss";
+
+//Views
+@import "./views/HomePage.scss";
+@import "./views/boardApp.scss";
+@import "./views/UserProfile.scss";
+
+// Components
+@import "./cmps/HomeHeader.scss";
+@import "./cmps/SignUp.scss";
+@import "./cmps/Login.scss";
+@import "./cmps/MainSideBar.scss";
+@import "./cmps/GroupList.scss";
+@import "./cmps/BoardPreview.scss";
+@import "./cmps//CardPreview.scss";
+@import './cmps/BoardHeader.scss';
+@import './cmps/LabelMenu.scss';
+@import './cmps//DatePicker.scss';
+@import './cmps/BoardSideBar.scss';
+@import './cmps/GroupPreview.scss';
+@import './cmps/BoardFilter.scss';
+@import './cmps/ConfirmModal.scss';
+@import './cmps/Colors.scss';
+@import './cmps//DashBoard.scss';
+@import './cmps//SnackBar.scss';
+@import './cmps/CardUpdates.scss';
+@import './cmps/Activities.scss';
+@import './cmps/UserNotifications.scss';
+

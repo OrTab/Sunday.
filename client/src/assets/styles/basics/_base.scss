@@ -1,0 +1,53 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Heebo", sans-serif;
+}
+
+img {
+    width: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0 0 0.1em;
+}
+
+p {
+    margin: 0 0 2em;
+}
+
+a {
+    text-decoration: none;
+}
+
+ul {
+    margin: 0;
+    list-style-type: none;
+}
+
+button {
+    cursor: pointer;
+    font-family: "Heebo", sans-serif;
+    &:focus {
+        outline: none;
+    }
+}
+
+input,
+textarea {
+    font-family: "Heebo", sans-serif;
+
+    &:focus {
+        outline: none;
+    }
+}
+
+

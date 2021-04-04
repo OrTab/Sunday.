@@ -1,0 +1,36 @@
+.modal-wrapper {
+    position: fixed;
+    top: 0;
+    bottom: 0%;
+    right: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.466);
+    z-index: 999;
+}
+
+.modal-content {
+    background-color: $white;
+    text-align: center;
+    position: absolute;
+    width: 35em;
+    padding: 1em;
+    top: 40vh;
+    left: calc(50vw - 35em / 2);
+    color: #323338;
+    box-shadow: 0 4px 17px 6px rgba(0, 0, 0, 0.1);
+    & .btn-confirm {
+        display: flex;
+        justify-content: flex-start;
+        gap: 10px;
+    }
+    & .MuiButton-contained {
+        font-family: "Heebo", sans-serif;
+        font-weight: 700;
+    }
+}
+@media (max-width: 768px) {
+    .modal-content {
+        width: 20em;
+        left: calc(50vw - 20em / 2);
+    }
+}

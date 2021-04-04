@@ -1,0 +1,143 @@
+// Font Sizes
+.fs12 {
+    font-size: rem(12px);
+}
+.fs14 {
+    font-size: rem(14px);
+}
+.fs18 {
+    font-size: rem(18px);
+}
+.fs20 {
+    font-size: rem(20px);
+}
+.fs24 {
+    font-size: rem(24px);
+}
+.fs28 {
+    font-size: rem(28px);
+}
+.fs30 {
+    font-size: rem(30px);
+}
+
+// flex helpers
+
+.flex {
+    display: flex;
+
+    > *.full {
+        flex: 1;
+    }
+    &.column {
+        flex-direction: column;
+    }
+    &.justify-center {
+        justify-content: center;
+    }
+    &.align-center {
+        align-items: center;
+    }
+    &.space-between {
+        justify-content: space-between;
+    }
+    &.space-around {
+        justify-content: space-around;
+    }
+
+    &.flex-end {
+        justify-content: flex-end;
+    }
+
+    &.align-flex-end {
+        align-items: flex-end;
+    }
+}
+.absolute {
+    position: absolute;
+}
+.relative {
+    position: relative;
+}
+// Media helpers
+
+.square-ratio {
+    @include aspect-ratio(1, 1);
+}
+.video-ratio {
+    @include aspect-ratio(16, 9);
+}
+.portrait-ratio {
+    @include aspect-ratio(9, 16);
+}
+
+//Component helpers
+.contentEditable {
+    white-space: pre-wrap;
+    display: inline-block;
+}
+
+.avatar-img {
+    cursor: pointer;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    border: 2px solid #f1f1f1;
+}
+
+.editable-element {
+    display: inline-block;
+    padding: 0 2px;
+    cursor: text;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    &:hover {
+        outline: 1.5px dashed #3333338c;
+    }
+
+    &:focus {
+        text-overflow: clip;
+        outline: 2px dashed #333333bb;
+    }
+}
+
+.search-field {
+    position: relative;
+    height: 35px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: $black;
+    display: flex;
+    align-items: center;
+
+    & svg {
+        position: absolute;
+        margin-left: 5px;
+    }
+
+    & input {
+        background-color: rgba(255, 255, 255, 0);
+        width: 100px;
+        padding: 5px 5px 5px 30px;
+        border: none;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        border-radius: 3px;
+        transition: all 0.2s ease;
+        height: 100%;
+        &:hover {
+            background-color: $lightgrey;
+        }
+
+        &:focus {
+            width: 100%;
+            border: 1px solid $blue;
+            &:hover {
+                background-color: rgba(255, 255, 255, 0);
+            }
+        }
+    }
+}

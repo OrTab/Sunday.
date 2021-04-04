@@ -1,0 +1,250 @@
+.card-updates {
+    @include scrollbars(10px, #afafaf);
+    padding-top: 25px;
+    background-color: white;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    max-width: 500px;
+    width: 500px;
+    z-index: 99;
+    overflow-y: auto;
+    box-shadow: 0 3px 10px -5px #484444;
+    transform: translateX(100%);
+    transition: transform 0.3s;
+    z-index: 99;
+
+    & .updates-card-header {
+        width: 100%;
+        display: flex;
+        padding: 25px;
+
+        & .card-status {
+            color: $white;
+            padding: 5px 10px;
+        }
+    }
+
+    & .back-arrow {
+        & svg {
+            padding: 10px;
+            box-sizing: content-box;
+            fill: $black;
+            font-size: 1.5rem;
+            transition: fill 0.2s ease;
+            &:hover {
+                fill: $blue;
+            }
+        }
+    }
+    &.open {
+        transform: translateX(0);
+    }
+
+    &.close-Activities {
+    }
+
+    & .text-editor-wrapper {
+        & form {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            padding: 0 25px;
+            margin-bottom: 25px;
+
+            & .card-update-btn {
+                margin-top: 10px;
+            }
+
+            & .upload-file-label {
+                display: flex;
+                align-items: flex-end;
+                cursor: pointer;
+                font-size: 0.8rem;
+                transition: color 0.2s ease;
+
+                &:hover {
+                    color: $grey;
+                    & svg {
+                        fill: rgb(154, 186, 255);
+                    }
+                }
+
+                & svg {
+                    font-size: 2.5rem;
+                    fill: $blue;
+                    margin: 0 5px -5px 0;
+                }
+            }
+
+            & .updates-bottom-btns {
+                width: 100%;
+            }
+        }
+    }
+    & .sun-editor {
+        // border: 1px solid $blue;
+        // max-width: 85%;
+        margin: 0 auto;
+        border-radius: 8px;
+        border: 1px solid $blue;
+
+        & .se-container {
+            border-radius: 8px;
+
+            .se-wrapper {
+                border-radius: 0 0 8px 8px;
+            }
+        }
+        // box-shadow: 0 3px 10px -5px #484444;
+        // overflow: hidden;
+
+        & .se-wrapper-inner.se-wrapper-wysiwyg.sun-editor-editable {
+            @include scrollbars(10px, #afafaf);
+            height: unset !important;
+            min-height: 100px !important;
+            max-height: 400px !important;
+            padding: 0 0.5em;
+            & h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6,
+            p {
+                margin-block-end: unset;
+                margin-block-start: unset;
+            }
+        }
+    }
+
+    & .se-toolbar {
+        background-color: #ffffff00;
+        width: 100%;
+        border-radius: 8px 8px 0 0;
+        outline: none !important;
+        border-bottom: 1px solid $lightgrey;
+        & .se-btn-tray {
+            border-radius: 10px 10px 0 0;
+            text-align: center;
+            line-height: 1;
+            height: fit-content;
+            background-color: #fff;
+
+            & .se-btn {
+            }
+            & svg {
+                width: 0.9em;
+                height: 0.9em;
+            }
+        }
+        & .se-btn-tray > * {
+            border: none;
+        }
+    }
+    & .se-resizing-bar {
+        display: none !important;
+        // background-color: #ffffff00;
+        // border: none;
+        // & .se-navigation {
+        // }
+    }
+
+    & .sun-editor .se-dialog .se-dialog-inner .se-dialog-form-footer,
+    .se-dialog-footer > div:first-child,
+    .se-dialog .se-dialog-inner .se-dialog-size-text,
+    .se-dialog-btn-revert {
+        display: none;
+    }
+
+    & input[type="file"] {
+        display: none;
+    }
+
+    .sun-editor .se-dialog .se-dialog-inner .se-dialog-content {
+        top: calc(50vh - 350px);
+    }
+}
+
+.card-update-title {
+}
+
+#root
+    > div
+    > div
+    > div:nth-child(4)
+    > section
+    > div.text-editor-wrapper
+    > div
+    > div
+    > div.se-dialog.sun-editor-common
+    > div.se-dialog-inner
+    > div.se-dialog-content.se-dialog-image
+    > form
+    > div._se_tab_content._se_tab_content_image
+    > div
+    > div:nth-child(3),
+#root
+    > div
+    > div
+    > div:nth-child(4)
+    > section
+    > div.text-editor-wrapper
+    > div
+    > div
+    > div.se-dialog.sun-editor-common
+    > div.se-dialog-inner
+    > div:nth-child(3)
+    > form
+    > div.se-dialog-body
+    > div:nth-child(2) {
+    display: none !important;
+}
+.updates-container {
+    display: flex;
+    flex-direction: column;
+    max-height: 60%;
+    & .update {
+        border: 1px $grey solid;
+        border-radius: 8px;
+        margin: 25px;
+
+        & p,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            margin: 0%;
+        }
+    }
+
+    & .update-header {
+        padding: 10px;
+        border-bottom: 1px $grey solid;
+        flex-wrap: wrap;
+        & .created-at {
+            font-size: 0.8rem;
+        }
+        & .user-thumbnail {
+            margin-right: 8px;
+        }
+    }
+
+    & .update-body {
+        padding: 10px;
+        min-height: 100px;
+        & span {
+            display: block !important;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .card-updates {
+        max-width: unset;
+        width: 100%;
+    }
+}

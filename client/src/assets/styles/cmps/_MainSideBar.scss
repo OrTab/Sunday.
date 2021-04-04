@@ -1,0 +1,148 @@
+.main-sidebar-inner-container {
+    background-color: #292f4c;
+    height: 100%;
+    padding: 20px 5px;
+    justify-content: space-between;
+
+    & svg {
+        color: $white;
+        font-size: 2.5em;
+        cursor: pointer;
+        border-radius: 50%;
+        padding: 5px;
+        transition: background 0.2s ease;
+
+        &:hover {
+            background-color: #343b61;
+        }
+    }
+
+    & .sunday-icon {
+        max-width: 40px;
+        max-height: 40px;
+        margin-bottom: 55px;
+    }
+
+    & .main-side-bar-bottom,
+    & .main-side-bar-top {
+        & svg:not(:last-child) {
+            margin-bottom: 20px;
+        }
+    }
+}
+
+.greet-user {
+    background-color: #00ca72;
+    min-height: 100px;
+    width: 40px;
+    border-radius: 0px 16px 16px 0px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 35%;
+    left: 0;
+    height: 220px;
+    cursor: pointer;
+
+    &:hover {
+        width: 48px;
+        background-color: #00a25b;
+    }
+
+    & span {
+        transform: rotate(270deg);
+        color: $white;
+        white-space: nowrap;
+        text-align: center;
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-sidebar-container {
+        & .main-sidebar-inner-container {
+            & .sunday-icon {
+                margin-bottom: 0;
+            }
+
+            background-color: #292f4c;
+            padding: 10px 25px;
+            flex-direction: row;
+            justify-content: space-between;
+
+            & svg {
+                color: $white;
+                font-size: 2.5em;
+                cursor: pointer;
+                border-radius: 50%;
+                padding: 5px;
+                transition: background 0.2s ease;
+
+                &:hover {
+                    background-color: #343b61;
+                }
+            }
+
+            & .main-side-bar-bottom,
+            & .main-side-bar-top {
+                flex-direction: row;
+                align-items: center;
+                & svg:not(:last-child) {
+                    margin-bottom: 0;
+                }
+
+                & a {
+                    display: flex;
+                }
+            }
+            & .main-side-bar-top {
+                & > div {
+                    position: fixed;
+                    bottom: 20px;
+                    left: 20px;
+                    background-color: $blue;
+                    z-index: 10;
+                    display: flex;
+                    padding: 5px;
+                    border-radius: 50%;
+                    transition: background 0.2s ease;
+
+                    &:hover {
+                        background-color: rgb(109, 157, 247);
+                    }
+                    & svg {
+                        color: $white;
+                        font-size: 2.5em;
+                        cursor: pointer;
+                        border-radius: 50%;
+                        padding: 5px;
+                        transition: background 0.2s ease;
+                        &:hover {
+                            background-color: unset;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .greet-user {
+        display: none;
+    }
+}
+.count-notifications {
+    transition: 0.2s ease;
+    position: absolute;
+    background-color: $grey;
+    color: $white;
+    width: 20px;
+    font-size: 0.8rem;
+    line-height: 20px;
+    text-align: center;
+    border-radius: 50%;
+    top: -8%;
+    z-index: 10;
+    left: -1px;
+}

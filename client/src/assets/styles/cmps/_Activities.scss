@@ -1,0 +1,142 @@
+.activity-display {
+    padding: 10px;
+    border-radius: 3px;
+    border: 1px solid #d1c9c9;
+    min-width: 130px;
+    display: flex;
+    justify-content: center;
+    transition: 0.3s;
+}
+
+.activities {
+    background-color: $white;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    width: 600px;
+    z-index: 999;
+    overflow-y: auto;
+    padding: 10px 15px 0;
+    box-shadow: 0 3px 10px -5px #484444;
+    transform: translateX(100%);
+    transition: transform 0.3s;
+
+    & svg {
+        padding: 10px 0;
+        box-sizing: content-box;
+        fill: $black;
+        font-size: 1.5rem;
+        transition: fill 0.2s ease;
+        cursor: pointer;
+        &:hover {
+            fill: $blue;
+        }
+    }
+
+    &.open {
+        transform: translateX(0);
+    }
+
+    & .activities-board-title {
+        font-weight: 400;
+
+        & > span {
+            font-weight: 700;
+        }
+    }
+
+    & .activity-filter {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        border-bottom: 1px solid $grey;
+        padding-bottom: 8px;
+        margin-bottom: 25px;
+        & > div:nth-child(2) {
+            display: flex;
+        }
+
+        & button {
+            background-color: $red;
+            height: 35px;
+            font-size: 0.9rem;
+            color: $white;
+            white-space: nowrap;
+            border-radius: 3px;
+            transition: background 0.2s ease;
+            border: none;
+
+            &:hover {
+                background-color: darken($red, 20);
+            }
+        }
+
+        & .search-field {
+            margin-right: 10px;
+        }
+    }
+
+    @include scrollbars(8px, #afafaf);
+    & .activity-list {
+        display: flex;
+        flex-direction: column;
+
+        & .activity {
+            display: flex;
+            width: 100%;
+            min-height: 100px;
+            align-items: center;
+
+            & > div:first-child {
+                display: flex;
+                align-items: center;
+                min-width: 160px;
+                & h2 {
+                    font-size: 1.2rem;
+                }
+                & h4 {
+                    font-size: 0.8rem;
+                    font-weight: 400;
+                    color: $black;
+                }
+
+                & .user-thumbnail {
+                    margin: 0 8px;
+                    font-size: 1.2rem;
+                    line-height: 38px;
+                    width: 38px;
+                    height: 38px;
+                }
+            }
+            & > div:nth-child(2) {
+                & h4 {
+                    font-size: 0.9rem;
+                    font-weight: 400;
+                }
+            }
+        }
+        & .activity:not(:last-child) {
+            border-bottom: 2px solid $lightgrey;
+        }
+    }
+}
+
+.close-Activities {
+    transition: 0.5s;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.452);
+    z-index: 80;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .activities {
+        max-width: unset;
+        width: 100%;
+    }
+}

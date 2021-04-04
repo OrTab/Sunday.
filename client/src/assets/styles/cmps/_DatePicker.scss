@@ -1,0 +1,77 @@
+.dateRange-container {
+    position: relative;
+}
+.datePicker {
+    position: absolute;
+    top: 105%;
+    z-index: 5;
+    left: -80%;
+    font-weight: 600;
+}
+.date-btn {
+    background-color: rgba(255, 255, 255, 0);
+    position: absolute;
+    bottom: 0%;
+    right: 0;
+    border: none;
+    font-weight: 700;
+    transition: color 0.2s;
+    font-size: 1rem;
+}
+
+.DayPicker_focusRegion {
+    padding-bottom: 20px;
+}
+.CalendarDay__selected_span {
+    background-color: whitesmoke;
+    border: 1px solid $white;
+}
+
+.CalendarDay__selected {
+    background-color: #1988f0 !important;
+    color: white !important;
+}
+
+ .CalendarDay__selected:hover {
+    background: #1988f0 !important;
+    border: 1px solid $white !important;
+ }
+
+.CalendarDay__hovered_span:hover,
+.CalendarDay__hovered_span {
+    border: 1px solid $white !important;
+    background: #76b7f398 !important;
+    color: $black !important;
+}
+
+.CalendarDay__selected,
+.CalendarDay__selected:active,
+.CalendarDay__selected:hover {
+    background-color: #1988f0 !important;
+    border: 1px solid $white !important;
+}
+
+.progressbar-container {
+    width: 100%;
+    background-color: $grey;
+    position: relative;
+    text-align: center;
+    border-radius: 20px;
+    height: 30px;
+    overflow: hidden;
+    margin: 0.2em;
+    & .inner-progressbar {
+        height: 100%;
+        transition: 1s;
+        & span {
+            position: absolute;
+            line-height: 30px;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            top: 0;
+            color: $white;
+            font-size: 0.9em;
+        }
+    }
+}

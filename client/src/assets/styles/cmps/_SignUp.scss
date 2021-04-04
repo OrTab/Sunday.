@@ -1,0 +1,32 @@
+
+.sign-up-container{
+    .form-signup{
+        display: flex;
+        flex-direction: column;
+        .MuiSvgIcon-root{
+            position: absolute;
+            right: 0;
+            // top: 20%;
+
+        }
+        .password-container{
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      
+            // position: absolute;
+            // top: 53%;
+            // right: 10%;
+        }
+    }
+    background-color:'#fff';
+    box-shadow: 0 3px 10px -5px #484444;
+    padding: 20px;
+    position: absolute;
+    width: 50%;
+    min-height: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    border-radius: 5px;
+}
