@@ -24,3 +24,5 @@ yarn-debug.log*
 yarn-error.log*
 .eslintcache
 backend.log
+./config/dev.js
+./config/prod.js
