@@ -6,7 +6,7 @@ export const utilService = {
     getNameInitials,
     getRandomPassword,
     getNameOfMonth,
-    
+
 
 }
 
@@ -16,7 +16,6 @@ function delay(ms = 1500) {
     })
 }
 
-
 function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -25,7 +24,7 @@ function getRandomInt(min, max) {
 function getNameInitials(name) {
     name = name.split(' ');
     const newName = name.map(word => word[0]).join('').toUpperCase();
-    return newName;
+    return newName.length > 3 ? newName.substring(0, 3) : newName;
 
 }
 function makeId(length = 5) {

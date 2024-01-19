@@ -72,7 +72,7 @@ function _buildCriteria(filterBy) {
 
     const criteria = {}
     if (filterBy.userId) {
-        criteria.members = { $elemMatch: { _id: ObjectId(filterBy.userId) } }
+        criteria.members = { $in: [ filterBy.userId ] }
         // {members:{$elemMatch:{_id:ObjectId(filterBy.userId)}}}
     }
     return criteria

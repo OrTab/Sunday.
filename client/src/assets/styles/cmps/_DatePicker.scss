@@ -1,5 +1,6 @@
 .dateRange-container {
     position: relative;
+    cursor: pointer;
 }
 .datePicker {
     position: absolute;
@@ -9,14 +10,18 @@
     font-weight: 600;
 }
 .date-btn {
-    background-color: rgba(255, 255, 255, 0);
+    background-color: #eeeeee;
+    border-radius: 3px;
     position: absolute;
-    bottom: 0%;
-    right: 0;
+    bottom: 10px;
+    left: 22px;
     border: none;
-    font-weight: 700;
-    transition: color 0.2s;
-    font-size: 1rem;
+    font-weight: 400;
+    transition: background 0.2s ease;
+    font-size: 0.9rem;
+    &:hover {
+        background-color: #dddddd;
+    }
 }
 
 .DayPicker_focusRegion {
@@ -32,10 +37,10 @@
     color: white !important;
 }
 
- .CalendarDay__selected:hover {
+.CalendarDay__selected:hover {
     background: #1988f0 !important;
     border: 1px solid $white !important;
- }
+}
 
 .CalendarDay__hovered_span:hover,
 .CalendarDay__hovered_span {
@@ -52,12 +57,12 @@
 }
 
 .progressbar-container {
-    width: 100%;
+    width: 95%;
     background-color: $grey;
     position: relative;
     text-align: center;
     border-radius: 20px;
-    height: 30px;
+    height: 26px;
     overflow: hidden;
     margin: 0.2em;
     & .inner-progressbar {
@@ -65,7 +70,7 @@
         transition: 1s;
         & span {
             position: absolute;
-            line-height: 30px;
+            line-height: 26px;
             right: 0;
             bottom: 0;
             left: 0;

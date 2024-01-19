@@ -14,7 +14,8 @@ export class _UpdateProfile extends Component {
             imgUrl: '',
             tel: ''
         },
-        triggerMsg: false
+        triggerMsg: false,
+        isLoading: false
     }
 
     validatePhoneNumber = (tel) => {
@@ -26,6 +27,12 @@ export class _UpdateProfile extends Component {
         const { user } = this.props;
         this.setState({ user });
     }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (prevProps.user !== this.props.user) this.setState({ user: this.props.user })
+
+    }
+
 
     handleChange = (ev) => {
         const { name, value } = ev.target
@@ -43,18 +50,20 @@ export class _UpdateProfile extends Component {
         });
     }
 
-    uploadImg = async (ev) => {
+    uploadImg = (ev) => {
         if (!ev.target.files[0]) return
-        const imgUrl = await cloudinaryService.uploadImg(ev.target.files[0]);
-        const { user } = this.state;
-        const userCopy = { ...user };
-        userCopy["imgUrl"] = imgUrl;
-        this.setState({ user: userCopy });
+        this.setState({ isLoading: true }, async () => {
+            const imgUrl = await cloudinaryService.uploadImg(ev.target.files[0]);
+            const userCopy = { ...this.state.user };
+            userCopy["imgUrl"] = imgUrl;
+            this.setState({ user: userCopy, isLoading: false });
+        })
     }
 
     onUpdateProfile = async (ev) => {
         ev.preventDefault();
-        const { user } = this.state;
+        const { user, isLoading } = this.state;
+        if (isLoading) return this.onTriggerMsg('Please wait for loading your image')
         if (!user.fullname || !user.email) {
             this.onTriggerMsg('Please fill required fields');
             return;
@@ -66,25 +75,37 @@ export class _UpdateProfile extends Component {
                 return;
             }
         }
-        await this.props.updateUser(user);
+        await this.props.updateUser(user, 'updateDetails');
         this.onTriggerMsg('Profile updated successfully!');
     }
-
+    //    {!isLoading ? <h3>{user.imgUrl ? 'Change' : 'Upload'}</h3>
+    //                             : <h3>Loading</h3>}
+    //                     </div>
     render() {
-        const { user, triggerMsg } = this.state;
+        const { user, triggerMsg, isLoading } = this.state;
         return <div className="update-profile-container">
             <div className="update-profile-inner-container">
                 <form onSubmit={this.onUpdateProfile}>
-                    <div>
+                    {!isLoading ? <div className={isLoading ? 'loading-img' : ''}>
                         <label>{user.imgUrl ? <div className="user-hover relative">
-                            <img className="user-thumbnail" src={user.imgUrl} alt="profile" />
-                            <h3>{user.imgUrl ? 'Change' : 'Upload'}</h3>
+                            <img className={`user-thumbnail ${isLoading ? 'loading-img' : ''}`} src={user.imgUrl} alt="profile" />
+                            <h3 className={isLoading ? 'loading' : ''} >{isLoading ? 'Loading' : 'Change'} </h3>
                         </div> :
-                            <span className="user-thumbnail">{utilService.getNameInitials(user.fullname)}</span>}
+
+                            <div className="user-hover relative">
+                                <span className={`user-thumbnail ${isLoading ? 'loading-img' : ''}`}>{utilService.getNameInitials(user.fullname)}</span>
+
+                                <h3 className={isLoading && !user.imgUrl ? 'loading' : ''} >{isLoading ? 'Loading' : 'Upload'} </h3>
+                            </div>
+                        }
                             <input onChange={this.uploadImg} type="file" />
+
+
                         </label>
-                        <h3>{user.imgUrl ? 'Change' : 'Upload'}</h3>
-                    </div>
+                    </div> :
+                        <div className="user-thumbnail loader-img-container" style={{ filter: 'unset' }}>
+                            <img className="loader-img" src="https://i.gifer.com/7SMw.gif" />
+                        </div>}
                     <div>
                         <label aria-required htmlFor="full-name">Full name</label>
                         <input value={user.fullname || ''} onChange={this.handleChange} type="text" placeholder="Full name" name="fullname" id="full-name" />
@@ -113,6 +134,7 @@ export class _UpdateProfile extends Component {
 
 const mapGlobalStateToProps = (state) => {
     return {
+        user: state.userReducer.loggedInUser,
     }
 }
 const mapDispatchToProps = {

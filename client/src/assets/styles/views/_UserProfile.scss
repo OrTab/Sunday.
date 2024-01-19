@@ -38,6 +38,12 @@
                 font-size: 3.5rem;
                 margin-bottom: 25px;
                 user-select: none;
+
+                & img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
             }
 
             & h3 {
@@ -82,7 +88,7 @@
             height: 100%;
             padding: 20px;
             justify-content: center;
-            & > div {
+            & .list-container {
                 border: solid 3px $lightgrey;
                 padding: 20px;
                 max-width: 350px;
@@ -93,7 +99,7 @@
                 flex-direction: column;
                 justify-content: space-between;
 
-                & > div:first-child {
+                & .list-title-container {
                     display: flex;
                     justify-content: space-between;
                     & > h2 {
@@ -106,7 +112,7 @@
                     }
                 }
 
-                & > div:nth-child(2) {
+                & .list-items-container {
                     color: $black;
                     overflow-y: auto;
                     padding: 10px;
@@ -116,97 +122,43 @@
                     @include scrollbars(8px, $grey);
                     width: 100%;
 
-                    & .active-items-list-row {
-                        display: flex;
-                        width: 100%;
-                        align-items: center;
-                        padding: 0 5px;
-                        background-color: rgb(238, 238, 238);
-                        height: 40px;
-                        & h3 {
-                            font-weight: 400;
-                            font-size: 1rem;
-                            overflow: hidden;
-                            text-overflow: ellipsis;
-                            white-space: nowrap;
-                        }
-
+                    & .info-row {
                         &:not(:last-child) {
                             margin-bottom: 10px;
                         }
-                    }
-
-                    // & .users-boards-list-row {
-                    //     overflow: hidden;
-                    //     text-overflow: ellipsis;
-                    //     white-space: nowrap;
-                    // }
-                    & .users-boards-list-row {
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        white-space: nowrap;
-                    }
-                    & a:not(:last-child) {
-                        margin-bottom: 10px;
-                    }
-
-                    & a {
-                        color: $black;
-                        padding: 0 5px;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        white-space: nowrap;
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                        font-size: 1rem;
-                        width: 100%;
-                        transition: all 0.2s ease;
-
-                        & span {
+                        & a {
+                            padding: 0 5px;
+                            min-height: 40px;
+                            color: $black;
                             overflow: hidden;
                             text-overflow: ellipsis;
                             white-space: nowrap;
-                        }
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            transition: all 0.2s ease;
 
-                        &:hover {
-                            background-color: $lightgrey;
+                            & span {
+                                font-size: 1rem;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                            }
+
+                            &:hover {
+                                background-color: $lightgrey;
+
+                                & svg {
+                                    color: $blue;
+                                }
+                            }
 
                             & svg {
-                                color: $blue;
+                                font-size: 2rem;
                             }
-                        }
-
-                        & svg {
-                            font-size: 2rem;
-                            margin-left: 10px;
                         }
                     }
                 }
-            }
-        }
-    }
-
-    & .personal-info-container {
-        display: flex;
-        align-items: center;
-        & .personal-info-icon-row {
-            display: flex;
-            align-items: center;
-            & a {
-                justify-content: flex-start !important;
-                padding: 5px !important;
-                & svg {
-                    margin: 0 12px 0 0 !important;
-                }
-            }
-
-            &:not(:last-child) {
-                margin-bottom: 10px;
-            }
-
-            & h3 {
-                font-weight: 400;
             }
         }
     }
@@ -253,6 +205,7 @@
             }
 
             & .user-thumbnail {
+                position: relative;
                 display: inline-block;
                 font-size: 3rem;
                 width: 125px;
@@ -260,10 +213,22 @@
                 line-height: 125px;
                 cursor: pointer;
                 transition: all 0.2s ease;
+                margin: auto;
 
                 &:hover {
                     filter: brightness(50%);
+
+                    &h3 {
+                        opacity: 1;
+                    }
                 }
+
+                &.loading-img {
+                    filter: brightness(50%);
+                }
+            }
+            .loader-img-container {
+                width: 70%;
             }
 
             & > div:first-child {
@@ -286,6 +251,10 @@
                     transform: translate(-50%, -50%);
                     opacity: 0;
                     transition: opacity 0.2s ease;
+
+                    &.loading {
+                        opacity: 1;
+                    }
                 }
                 & label {
                     margin: auto;
@@ -312,5 +281,17 @@
                 }
             }
         }
+    }
+}
+
+@media (max-width: 768px) {
+    .user-profile-main-container {
+        display: block;
+        & .user-profile-panel {
+            height: calc(100vh - 65px);
+        }
+    }
+    .sunday-tooltip {
+        display: none !important;
     }
 }

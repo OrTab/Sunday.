@@ -3,8 +3,10 @@
     height: 100%;
     position: relative;
     color: $white;
+    text-align: center;
 
     & .labels-menu-item {
+        position: relative;
         width: 100%;
         height: 40px;
         display: flex;
@@ -14,6 +16,19 @@
         cursor: pointer;
         &:hover {
             box-shadow: inset 0 0 100px 100px hsla(0, 0%, 100%, 0.3);
+        }
+    }
+
+    & .opt-icon {
+        position: absolute;
+        width: 20px;
+        top: -10%;
+        right: -2%;
+    }
+
+    .label-options {
+        .label-delete-btn {
+            position: absolute;
         }
     }
 
@@ -51,7 +66,9 @@
         z-index: 999;
         background-color: #f9f9f9;
         padding: 5px;
-
+        &.last {
+         margin-right: 4em;
+        }
         & .labels-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -98,6 +115,10 @@
             }
         }
     }
+
+    & .edit-label-btn {
+        font-size: rem(11px);
+    }
 }
 
 //Corner fold effect
@@ -112,9 +133,8 @@
         right: 0px;
         border-width: 0;
         border-style: solid;
-        background: #dbdbdb;
+        background: #00000031;
         display: block;
-        /*border-radius:3px 0 0 0;*/
         border-color: transparent #fff transparent #fff;
 
         -webkit-transition: border-width 0.2s ease-out;
@@ -125,7 +145,7 @@
     }
     &:hover {
         & .fold {
-            border-width: 0px 12px 12px 0px;
+            border-width: 0px 10px 10px 0px;
         }
     }
 }

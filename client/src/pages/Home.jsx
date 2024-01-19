@@ -1,13 +1,13 @@
 import React from 'react'
 import undrawtask from '../assets/img/undrawtask.svg';
 import { HomeHeader } from '../cmps/HomeHeader';
-import { connect } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 import { checkLogin, updateUserNotifications } from '../store/actions/userAction.js'
 import { loadBoards } from '../store/actions/boardAction.js'
+import { useEffect } from 'react';
 
 export function _Home(props) {
-
-
+   
     return <div className="home-main-container">
         <HomeHeader />
         <div className="home-hero">

@@ -15,6 +15,12 @@
     transition: transform 0.3s;
     z-index: 99;
 
+    & .created-at {
+        color: $grey;
+        display: block;
+        padding: 0 25px;
+    }
+
     & .updates-card-header {
         width: 100%;
         display: flex;
@@ -42,8 +48,8 @@
         transform: translateX(0);
     }
 
-    &.close-Activities {
-    }
+    // &.close-Activities {
+    // }
 
     & .text-editor-wrapper {
         & form {
@@ -132,8 +138,8 @@
             height: fit-content;
             background-color: #fff;
 
-            & .se-btn {
-            }
+            // & .se-btn {
+            // }
             & svg {
                 width: 0.9em;
                 height: 0.9em;
@@ -167,8 +173,8 @@
     }
 }
 
-.card-update-title {
-}
+// .card-update-title {
+// }
 
 #root
     > div
@@ -226,6 +232,7 @@
         border-bottom: 1px $grey solid;
         flex-wrap: wrap;
         & .created-at {
+            padding: unset;
             font-size: 0.8rem;
         }
         & .user-thumbnail {

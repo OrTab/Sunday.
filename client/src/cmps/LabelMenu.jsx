@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import { Colors } from './Colors';
-import { TextField } from '@material-ui/core';
+import { Button, TextField } from '@material-ui/core';
+import { Label } from './Label';
 
 
 export class LabelMenu extends Component {
@@ -15,8 +16,12 @@ export class LabelMenu extends Component {
         newLabel: {
             text: '',
             color: null
-        }
+        },
+        isShowOpt: false,
+        isEditLabel: false
     }
+
+    chosenLabel = React.createRef();
 
     componentWillUnmount() {
         this.setState({ newLabel: { text: '', color: null } });
@@ -25,13 +30,17 @@ export class LabelMenu extends Component {
 
     toggleMenu = () => {
         const { isOpen } = this.state;
-        this.setState({ isOpen: !isOpen });
+        this.setState({ isOpen: !isOpen, isEditLabel: false });
+        //    document.querySelector('.group-container').scrollHeight()
+        // const elGroup = document.querySelector('.labels-menu')
+        // elGroup.scrollBottom = elGroup.scrollHeight;
     }
 
     toggleAddNewLabel = () => {
         const { isAddLabelOpen } = this.state;
-        this.setState({ isAddLabelOpen: !isAddLabelOpen });
+        this.setState({ isAddLabelOpen: !isAddLabelOpen, newLabel: { text: '', color: null } });
     }
+
     toggleAddLabelError = () => {
         this.setState({ showAddLabelError: true }, () => {
             setTimeout(() => {
@@ -40,22 +49,20 @@ export class LabelMenu extends Component {
         });
     }
 
-    setCurrLabel = (newLabel) => {
+    setCurrLabel = (newLabel, labelGroup, labelType) => {
         const { currLabel } = this.props
         if (currLabel.text === newLabel.text) {
             this.toggleMenu();
             return
         }
         this.setState({ currLabel: newLabel }, () => {
-            this.props.onSaveLabel(newLabel, this.props.labelName);
+            this.props.onSaveLabel(newLabel, labelGroup, labelType);
             this.toggleMenu();
         });
     }
 
     setNewLabelColor = (color) => {
-        const { newLabel } = this.state
-        newLabel.color = color;
-        this.setState({ newLabel })
+        this.setState({ newLabel: { ...this.state.newLabel, color } })
     }
 
     addLabel = (ev) => {
@@ -77,41 +84,71 @@ export class LabelMenu extends Component {
         this.setState({ newLabel })
     }
 
+    toggleEdit = () => {
+        this.setState({ isEditLabel: !this.state.isEditLabel })
+    }
+
     render() {
-        const { labels, currLabel, enableAdding } = this.props;
-        const { isAddLabelOpen, isOpen, showAddLabelError, newLabel } = this.state;
+        const { labels, currLabel, onDeleteLabel, labelGroup, labelType, isLast, isScroll } = this.props;
+
+        const { isAddLabelOpen, isOpen, showAddLabelError, newLabel, isEditLabel } = this.state;
         return <div className="labels-menu-container">
-            <div className="labels-menu-chosen-item" onClick={this.toggleMenu} style={{ backgroundColor: currLabel.color }}>
+            <div
+                ref={this.chosenLabel}
+                className="labels-menu-chosen-item"
+                onClick={this.toggleMenu}
+                style={{ backgroundColor: currLabel.color }}
+            >
                 {currLabel.text}
                 <span className="fold"></span>
             </div>
             {isOpen &&
-                <ClickAwayListener onClickAway={this.toggleMenu}>
-                    <div onBlur={this.toggleMenu} className="labels-menu-floating-container">
+                <ClickAwayListener onClickAway={(ev) => {
+                    if (ev.target === this.chosenLabel.current) return
+                    this.toggleMenu()
+                }}>
+                    <div
+
+                        className={`labels-menu-floating-container${isLast ? ' last' : ''}`}
+                    >
                         <div className="labels-grid">
                             {labels.map((label, idx) => {
-                                return <div key={idx} className="labels-menu-item" onClick={() => this.setCurrLabel(label)}
-                                    style={{ backgroundColor: label.color }}>
-                                    {label.text}
-                                </div>
+                                return <Label
+                                    isEditLabel={isEditLabel}
+                                    label={label}
+                                    key={idx}
+                                    setCurrLabel={this.setCurrLabel}
+                                    labelType={labelType}
+                                    labelGroup={labelGroup}
+                                    toggleMenu={this.toggleMenu}
+                                    onDeleteLabel={onDeleteLabel} />
                             })}
-                            {enableAdding &&
-                                <div className="labels-menu-item new-label" onClick={this.toggleAddNewLabel}>
-                                    Add {this.props.labelName}
-                                </div>}
+                            <div
+                                className="labels-menu-item new-label"
+                                onClick={this.toggleAddNewLabel}
+                            >
+                                Add {this.props.labelType}
+                            </div>
                         </div>
-                        {(isAddLabelOpen && enableAdding) && <div className="add-new-label-container">
+                        {isAddLabelOpen && <div className="add-new-label-container">
                             <div className="flex space-between">
                                 <span onClick={this.toggleAddNewLabel}>Cancel</span>
                                 <span onClick={this.addLabel}>Save</span>
                             </div>
                             <form onSubmit={this.addLabel} className="relative">
-                                <span style={{ backgroundColor: `${newLabel.color ? newLabel.color : ''}` }} className="color-preview"></span>
-                                <TextField name="text" autoComplete="off" placeholder={showAddLabelError ? "Please enter label + color" : "Enter label"} onChange={this.handleInput} />
+                                <span
+                                    style={{ backgroundColor: `${newLabel.color ? newLabel.color : ''}` }}
+                                    className="color-preview"></span>
+                                <TextField
+                                    name="text"
+                                    autoComplete="off"
+                                    placeholder={showAddLabelError ? "Please enter label + color" : "Enter label"}
+                                    onChange={this.handleInput}
+                                />
                             </form>
                             <Colors onChangeColor={this.setNewLabelColor} />
                         </div>}
-
+                        <Button className="edit-label-btn" onClick={this.toggleEdit}>{isEditLabel ? 'Done' : 'Edit'}</Button>
                     </div>
                 </ClickAwayListener>
             }

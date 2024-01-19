@@ -6,27 +6,32 @@ export const userService = {
     signup,
     getUsers,
     getUserById,
+    getUsersById,
     remove,
     update,
     getLoggedinUser,
     updateNotifications,
     cleanNotifications,
-    updateReadNotifications
+    updateReadNotifications,
 }
 function getUsers(txt) {
     var queryStr = (!txt) ? '' : `?fullname=${txt}`
     return httpService.get(`user${queryStr}`)
 }
 async function getUserById(userId) {
-    const user = await httpService.get(`user/${userId}`)
-    return user
+    return await httpService.get(`user/${userId}`)
+
+}
+async function getUsersById(users) {
+    users = JSON.stringify(users)
+    return await httpService.get(`user/boardMembers?usersId=${users}`)
 }
 
 function remove(userId) {
     return httpService.delete(`user/${userId}`)
 }
-async function update(user) {
-    const updatedUser = await httpService.put(`user/${user._id}`, user)
+async function update(user,type) {
+    const updatedUser = await httpService.put(`user/${user._id}`, { user, type })
     // Handle case in which admin updates other user's details
     if (getLoggedinUser()._id === updatedUser._id) _saveLocalUser(updatedUser)
     return updatedUser
@@ -40,6 +45,8 @@ async function login(userCred) {
         throw new Error('Could\'nt find users')
     }
 }
+
+
 
 async function signup(userCred) {
     const user = await httpService.post('auth/signup', userCred)
@@ -60,7 +67,7 @@ function getLoggedinUser() {
     return JSON.parse(sessionStorage.getItem('loggedinUser'))
 }
 
-async function updateNotifications({ member, notificationTxt, user }) {
+async function updateNotifications({ memberId, notificationTxt, user }) {
     const notification = {
         id: utilService.makeId(),
         notificationTxt,
@@ -73,13 +80,13 @@ async function updateNotifications({ member, notificationTxt, user }) {
         }
     }
 
-    const memberToAdd = await getUserById(member._id)
+    const memberToAdd = await getUserById(memberId)
     if (!memberToAdd.notifications) {
         memberToAdd.notifications = [notification]
     } else {
         memberToAdd.notifications = [notification, ...memberToAdd.notifications]
     }
-    return update(memberToAdd)
+    return await update(memberToAdd)
 }
 
 function updateReadNotifications(memberToUpdate) {

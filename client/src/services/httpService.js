@@ -38,6 +38,7 @@ async function ajax(endpoint, method = 'get', data = null) {
         if (err.response && err.response.status === 401) {
             window.location.assign('/#/login')
         }
+        
         throw err
     }
 }

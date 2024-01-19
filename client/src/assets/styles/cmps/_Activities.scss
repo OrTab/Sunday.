@@ -138,5 +138,12 @@
     .activities {
         max-width: unset;
         width: 100%;
+
+        & .activity-filter {
+            flex-direction: column;
+            & > div {
+                justify-content: space-between;
+            }
+        }
     }
 }

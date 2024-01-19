@@ -1,5 +1,5 @@
 .board-sidebar-container {
-    background-color: $white;
+    background-color: #f5f6f8f3;
     border-right: 1px solid #3333332a;
 
     & .main-workspace-title {
@@ -12,7 +12,7 @@
 
             & span {
                 font-size: 1.2rem;
-                background-color: #1F76C2;
+                background-color: #1f76c2;
                 color: $white;
                 width: 25px;
                 height: 25px;
@@ -21,7 +21,6 @@
                 border-radius: 10px;
                 padding: 2px;
                 box-sizing: content-box;
-
             }
 
             & svg {
@@ -33,9 +32,8 @@
                 background-color: $white;
                 border-radius: 50%;
             }
-
         }
-        &>span:nth-child(2){
+        & > span:nth-child(2) {
             white-space: nowrap;
             font-weight: 700;
             margin-left: 8px;
@@ -44,6 +42,8 @@
 
     .board-side-bar {
         padding: 20px 10px 0;
+        height: 100%;
+        overflow: hidden;
 
         & .search-field {
             & input {
@@ -93,14 +93,14 @@
                 font-size: 1.1rem;
             }
         }
-        & .board-sidebar-row {
+        & .board-sidebar-item {
             display: flex;
             align-items: center;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            border-radius: 4px;
             transition: background 0.2s ease;
-
             & a {
                 font-size: 1rem;
                 color: $black;
@@ -115,7 +115,6 @@
 
             & svg {
                 transition: color 0.2s ease;
-                opacity: 0;
                 color: $grey;
                 cursor: pointer;
                 transition: all 0.2s ease;
@@ -124,16 +123,16 @@
                 }
             }
 
-            &:hover {
+            &:hover,
+            &.selected {
                 background-color: $lightgrey;
+                & a {
+                    color: $blue;
+                }
             }
 
-            &:hover a {
-                color: $blue;
-            }
-
-            &:hover svg {
-                opacity: 1;
+            &:not(:last-child){
+                margin-bottom: rem(5px);
             }
         }
 

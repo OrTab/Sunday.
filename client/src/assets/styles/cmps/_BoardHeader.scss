@@ -1,5 +1,5 @@
 .board-header {
-    padding: 15px 0 15px 10px;
+    padding: 15px;
     height: 150px;
     display: flex;
     border-bottom: 1px solid #3333332a;
@@ -7,7 +7,6 @@
     & .board-header-top-section {
         justify-content: space-between;
         align-items: flex-start;
-        padding-right: 10px;
 
         & .top-section-item {
             transition: all 0.2s ease;

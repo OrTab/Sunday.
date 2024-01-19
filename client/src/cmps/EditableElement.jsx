@@ -7,23 +7,27 @@ export class EditableElement extends Component {
         title: this.props.children,
         isEdit: true
     }
+
+
     handleChange = (ev) => {
-        const title = ev.currentTarget.innerText
+        const title = ev.currentTarget.textContent
         this.setState({ title })
     }
-
+    
     checkKey = async (ev) => {
         if ((ev.key === 'Enter' || ev.type === 'blur')/* &&this.state.title!==this.props.children */) {
+
             this.setState({ isEdit: false })
             const title = (this.state.title) ? this.state.title : 'New Title'
             setTimeout(() => {
                 this.setState({ isEdit: true })
+                if (this.state.title === this.props.children) return
                 this.props.onChangeTitle(title)
             }, 200)
         }
     }
     render() {
-        const { isEdit } = this.state
+        const { isEdit, title } = this.state
         return (
             <>
                 <div onKeyDown={this.checkKey}

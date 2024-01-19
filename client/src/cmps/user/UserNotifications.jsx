@@ -6,7 +6,6 @@ import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import moment from 'moment'
 import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
 import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
-import { userService } from "../../services/userService";
 import ReactTooltip from 'react-tooltip';
 
 const useStyles = makeStyles((theme) => ({
@@ -16,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export function UserNotifications({ notifications, onCleanNotifications, onUpdateNotifications }) {
-  
+
     const classes = useStyles();
     const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -35,7 +34,11 @@ export function UserNotifications({ notifications, onCleanNotifications, onUpdat
         <div>
             <div className="relative">
                 {notifications && <span className="count-notifications">{notifications.length}</span>}
-                <NotificationsNoneIcon data-tip data-for="notifications" aria-describedby={id} onClick={handleClick} />
+                <NotificationsNoneIcon
+                    data-tip data-for="notifications"
+                    aria-describedby={id}
+                    onClick={handleClick}
+                />
             </div>
             <Popover
                 id={id}
@@ -43,11 +46,11 @@ export function UserNotifications({ notifications, onCleanNotifications, onUpdat
                 anchorEl={anchorEl}
                 onClose={handleClose}
                 anchorOrigin={{
-                    vertical: 'top',
+                    vertical: 'bottom',
                     horizontal: 'right',
                 }}
                 transformOrigin={{
-                    vertical: 'center',
+                    vertical: 'top',
                     horizontal: 'left',
                 }}
             >

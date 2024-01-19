@@ -1,235 +1,319 @@
-import React, { Component } from 'react'
-import { connect } from 'react-redux';
-import { GroupPreview } from './GroupPreview';
-import { BoardHeader } from './BoardHeader';
+import { useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { GroupPreview } from "./group-preview-components/GroupPreview";
+import { BoardHeader } from "./BoardHeader";
 import {
-    loadBoards, addCard, addGroup, changeBoardTitle, onChangeGroupTitle, changeBoardMemebrs,
-    changeGroupColor, removeGroup, changeGroupIdx, changeCardIdx, getKeyById, onDragStart, onDragEnd
-} from '../store/actions/boardAction.js'
-import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import { DashBoard } from './DashBoard';
-import { boardService } from '../services/boardService'
-import { setMsg } from '../store/actions/userAction.js';
-export class _BoardPreview extends Component {
-    state = {
-        view: 'board',
-        filterBy: null,
-        onDrag: true,
-        isDelete: false,
-        board: this.props.board
+  addCard,
+  addGroup,
+  changeBoardTitle,
+  changeGroupTitle,
+  changeBoardMemebrs,
+  removeGroup,
+  changeGroupIdx,
+  changeCardIdx,
+  dragStart,
+} from "../store/actions/boardAction.js";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import { DashBoard } from "./DashBoard";
+import { boardService } from "../services/boardService";
+import { setMsg } from "../store/actions/userAction.js";
+import { NoResultsPlaceholder } from "./NoResultsPlaceholder";
+
+export const BoardPreview = (props) => {
+  const [filterBy, setFilterBy] = useState(null);
+  const [isShowDashboard, setIsShowDashboard] = useState(false);
+
+  const { board, onDrag, boardMembers } = useSelector(
+    ({ boardReducer }) => boardReducer
+  );
+  const loggedInUser = useSelector(
+    ({ userReducer }) => userReducer.loggedInUser
+  );
+  const dispatch = useDispatch();
+
+  const onAddCard = (cardTitle, groupId) => {
+    dispatch(addCard({ cardTitle, groupId, board, user: loggedInUser }));
+    dispatch(setMsg("Card Successfully Added"));
+  };
+  const onAddGroup = () => {
+    dispatch(addGroup(board, loggedInUser));
+  };
+  //Board Title
+  const onChangeTitle = (boardTitle) => {
+    dispatch(changeBoardTitle(boardTitle, board, loggedInUser));
+  };
+  //Group Title
+  const onChangeGroupTitle = (groupTitle, groupId) => {
+    dispatch(
+      changeGroupTitle({ board, groupId, groupTitle, user: loggedInUser })
+    );
+  };
+  const onChangeBoardMemebrs = (memberData, type) => {
+    dispatch(changeBoardMemebrs(memberData, board, type, loggedInUser));
+  };
+  const onRemoveGroup = (group) => {
+    dispatch(removeGroup(board, group, loggedInUser));
+    dispatch(setMsg("Group Successfully Removed"));
+  };
+  // onChangeBoardMemebrs = async (memberData, type) => {
+  //     console.log(memberData);
+  //     const { changeBoardMemebrs, loggedInUser, board } = this.props;
+  //     await changeBoardMemebrs(memberData, board, type, loggedInUser);
+  // }
+
+  // onRemoveGroup = async (group) => {
+  //     const { removeGroup, board, loggedInUser } = this.props;
+  //     await removeGroup(board, group, loggedInUser)
+  //     this.props.setMsg('Group Successfully Removed')
+  // }
+  const onDragStart = () => {
+    dispatch(dragStart());
+  };
+  // onDragEnd = (result) => {
+  //     props.onDragEnd()
+  //     const { destination, source, draggableId } = result
+  //     if (!destination) return
+  //     if (destination.droppableId === source.droppableId && destination.index === source.index || !destination.droppableId || !source.droppableId) return
+  //     const { changeGroupIdx, changeCardIdx, board } = props
+  //     const boardToUpdate = JSON.parse(JSON.stringify(board))
+  //     if (result.type === 'group') {
+  //         const newGroups = boardToUpdate.groups.map((group, idx, groups) => {
+  //             if (idx === source.index) return groups[destination.index]
+  //             if (idx === destination.index) return groups[source.index]
+  //             else return group
+  //         })
+  //         boardToUpdate.groups = newGroups;
+  //         changeGroupIdx(boardToUpdate, result)
+  //     }
+  //     else {
+  //         const sourceGroup = boardService.getKeyById(boardToUpdate, source.droppableId)
+  //         var cardToAdd = boardService.getKeyById(sourceGroup, draggableId)
+  //         const groups = boardToUpdate.groups.map(group => {
+  //             if (group.id === source.droppableId && group.id !== destination.droppableId) {
+  //                 group.cards.splice(source.index, 1)
+  //                 return group
+  //             } else if (group.id !== source.droppableId && group.id === destination.droppableId) {
+  //                 if (!cardToAdd) {
+  //                     cardToAdd = boardService.getKeyById(group, draggableId)
+  //                 }
+  //                 group.cards.splice(destination.index, 0, cardToAdd)
+  //                 return group
+  //             } else if (group.id === source.droppableId && group.id === destination.droppableId) {
+  //                 group.cards = group.cards.map((card, idx, cards) => {
+  //                     if (idx === source.index) return cards[destination.index]
+  //                     if (idx === destination.index) return cards[source.index]
+  //                     else return card
+  //                 })
+  //                 return group
+  //             } else return group
+  //         })
+  //         boardToUpdate.groups = groups
+  //         changeCardIdx(boardToUpdate, result)
+  //     }
+  // }
+
+  const onDragEnd = (result) => {
+    const { destination, source, draggableId, type } = result;
+    if (!destination) return;
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    )
+      return;
+    const boardToUpdate = { ...board };
+    const newGroups = Array.from(boardToUpdate.groups);
+    if (type === "group") {
+      const draggedGroup = boardToUpdate.groups.find(
+        (group) => group.id === draggableId
+      );
+      newGroups.splice(source.index, 1);
+      newGroups.splice(destination.index, 0, draggedGroup);
+      boardToUpdate.groups = newGroups;
+      dispatch(changeGroupIdx(boardToUpdate));
+    } else if (type === "card") {
+      const sourceGroup = boardToUpdate.groups.find(
+        (group) => group.id === source.droppableId
+      );
+      const destinationGroup = boardToUpdate.groups.find(
+        (group) => group.id === destination.droppableId
+      );
+      if (sourceGroup.id === destinationGroup.id) {
+        const newCards = Array.from(sourceGroup.cards);
+        const newCard = sourceGroup.cards.find(
+          (card) => card.id === draggableId
+        );
+        newCards.splice(source.index, 1);
+        newCards.splice(destination.index, 0, newCard);
+        const newGroup = {
+          ...sourceGroup,
+          cards: newCards,
+        };
+        const newIdx = boardToUpdate.groups.findIndex(
+          (group) => group.id === newGroup.id
+        );
+        boardToUpdate.groups.splice(newIdx, 1, newGroup);
+        dispatch(changeCardIdx(boardToUpdate));
+      } else {
+        const sourceGroupCards = Array.from(sourceGroup.cards);
+        sourceGroupCards.splice(source.index, 1);
+        const newSourceGroup = {
+          ...sourceGroup,
+          cards: sourceGroupCards,
+        };
+        const destinationGroupCards = Array.from(destinationGroup.cards);
+        const newCardToPaste = sourceGroup.cards.find(
+          (card) => card.id === draggableId
+        );
+        destinationGroupCards.splice(destination.index, 0, newCardToPaste);
+        const newDestinationGroup = {
+          ...destinationGroup,
+          cards: destinationGroupCards,
+        };
+        const sourceIdx = boardToUpdate.groups.findIndex(
+          (group) => group.id === newSourceGroup.id
+        );
+        const destinationIdx = boardToUpdate.groups.findIndex(
+          (group) => group.id === newDestinationGroup.id
+        );
+        boardToUpdate.groups.splice(sourceIdx, 1, newSourceGroup);
+        boardToUpdate.groups.splice(destinationIdx, 1, newDestinationGroup);
+        dispatch(changeCardIdx(boardToUpdate));
+      }
+    } else {
+      const groupId = source.droppableId.substring(
+        source.droppableId.indexOf("-") + 1
+      );
+      const groupIdx = newGroups.findIndex((group) => group.id === groupId);
+      const [sourceColumn] = newGroups[groupIdx].cardOrder.splice(
+        source.index,
+        1
+      );
+      newGroups[groupIdx].cardOrder.splice(destination.index, 0, sourceColumn);
+      boardToUpdate.groups = newGroups;
+      dispatch(changeCardIdx(boardToUpdate));
     }
-    componentDidUpdate(prevProps, prevState) {
-        if (prevProps.board !== this.props.board) this.setState({ board: this.props.board })
-        if (!prevProps.onDrag && this.props.onDrag) {
-            if (this.state.filterBy) {
-                const copyFilter = { ...this.state.filterBy }
-                copyFilter.sortBy = '';
-                this.setState({ filterBy: copyFilter, onDrag: true })
-            }
-        }
+  };
+
+  const changeBoardView = ({ target }) => {
+    const { value } = target;
+    if (value === "dashboard") setIsShowDashboard(true);
+    else setIsShowDashboard(false);
+  };
+  const onSetFilter = (filterBy) => {
+    setFilterBy(filterBy);
+  };
+
+  const filteredBoard = useMemo(() => {
+    const boardCopy = JSON.parse(JSON.stringify(board));
+    if (filterBy) {
+      if (filterBy.status.length) {
+        boardCopy.groups = boardCopy.groups.filter((group) => {
+          const filteredCards = group.cards.filter((card) => {
+            const status = filterBy.status.find((label) => {
+              return card.status.text === label;
+            });
+            if (!status) return false;
+            return true;
+          });
+          if (filteredCards.length) {
+            group.cards = filteredCards;
+            return true;
+          }
+          return false;
+        });
+      }
+      if (filterBy.priority.length) {
+        boardCopy.groups = boardCopy.groups.filter((group) => {
+          const filteredCards = group.cards.filter((card) => {
+            const priority = filterBy.priority.find((label) => {
+              return card.priority.text === label;
+            });
+            if (!priority) return false;
+            return true;
+          });
+          if (filteredCards.length) {
+            group.cards = filteredCards;
+            return true;
+          }
+          return false;
+        });
+      }
+      if (filterBy.membersId.length) {
+        boardCopy.groups = boardCopy.groups.filter((group) => {
+          const filteredCards = group.cards.filter((card) => {
+            const member = card.members.find((memberId) => {
+              return filterBy.membersId.includes(memberId);
+            });
+            if (!member) return false;
+            return true;
+          });
+          if (filteredCards.length) {
+            group.cards = filteredCards;
+            return true;
+          }
+          return false;
+        });
+      }
+      if (filterBy.sortBy && !onDrag) {
+        if (filterBy.sortBy === "name")
+          boardCopy.groups = boardService.sortByTitle(boardCopy.groups);
+        else boardCopy.groups = boardService.sortByDate(boardCopy.groups);
+      }
+      const filterRegex = new RegExp(filterBy.txt, "i");
+      boardCopy.groups = boardCopy.groups.filter((group) => {
+        const filteredCards = group.cards.filter((card) =>
+          filterRegex.test(card.title)
+        );
+        if (filteredCards.length) {
+          group.cards = filteredCards;
+          return true;
+        } else return false || filterRegex.test(group.title);
+      });
     }
-    onAddCard = async (cardTitle, groupId) => {
-        this.props.setMsg('Card Successfully Added')
-        const { board, addCard, loggedInUser } = this.props
-        await addCard({ cardTitle, groupId, board, user: loggedInUser })
-    }
-    onAddGroup = async () => {
-        const { board, loggedInUser, addGroup } = this.props;
-        await addGroup(board, loggedInUser);
-    }
-    //Board Title
-    onChangeTitle = async (boardTitle) => {
-        const { board, loggedInUser } = this.props
-        await this.props.changeBoardTitle(boardTitle, board, loggedInUser)
-    }
-    //Group Title
-    onChangeGroupTitle = async (groupTitle, groupId) => {
-        const { board, onChangeGroupTitle, loggedInUser } = this.props
-        await onChangeGroupTitle({ board: { ...board }, groupId, groupTitle, user: loggedInUser })
-    }
-    onChangeBoardMemebrs = async (memberData, type) => {
-        const { changeBoardMemebrs, loggedInUser, board } = this.props;
-        await changeBoardMemebrs(memberData, board, type, loggedInUser);
-    }
-    onChangeGroupColor = async (color, groupId) => {
-        this.props.setMsg('Group color Successfully Change')
-        const { changeGroupColor, board } = this.props;
-        await changeGroupColor(color, board, groupId)
-    }
-    onRemoveGroup = async (group) => {
-        const { removeGroup, board, loggedInUser } = this.props;
-        await removeGroup(board, group, loggedInUser)
-        this.props.setMsg('Group Successfully Removed')
-    }
-    onDragStart = () => {
-        this.props.onDragStart()
-    }
-    onDragEnd = async (result) => {
-        this.props.onDragEnd()
-        const { destination, source, draggableId } = result
-        if (!destination) return
-        if (destination.droppableId === source.droppableId && destination.index === source.index || !destination.droppableId || !source.droppableId) return
-        const { changeGroupIdx, changeCardIdx, board } = this.props
-        if (result.type === 'group') {
-            const boardToUpdate = await changeGroupIdx(board, result)
-            this.setState({ board: boardToUpdate })
-        }
-        else {
-            const boardToUpdate = JSON.parse(JSON.stringify(board))
-            const sourceGroup = boardService.getKeyById(boardToUpdate, source.droppableId)
-            var cardToAdd = boardService.getKeyById(sourceGroup, draggableId)
-            const groups = boardToUpdate.groups.map(group => {
-                if (group.id === source.droppableId && group.id !== destination.droppableId) {
-                    group.cards.splice(source.index, 1)
-                    return group
-                } else if (group.id !== source.droppableId && group.id === destination.droppableId) {
-                    if (!cardToAdd) {
-                        cardToAdd = boardService.getKeyById(group, draggableId)
-                    }
-                    group.cards.splice(destination.index, 0, cardToAdd)
-                    return group
-                } else if (group.id === source.droppableId && group.id === destination.droppableId) {
-                    group.cards = group.cards.map((card, idx, cards) => {
-                        if (idx === source.index) return cards[destination.index]
-                        if (idx === destination.index) return cards[source.index]
-                        else return card
-                    })
-                    return group
-                } else return group
-            })
-            boardToUpdate.groups = groups
-            this.setState({ board: boardToUpdate })
-            await changeCardIdx(boardToUpdate, result)
-        }
-    }
-    changeBoardView = (ev) => {
-        const { value } = ev.target
-        if (value === 'dashboard') this.setState({ isShowDashboard: true })
-        else this.setState({ isShowDashboard: false })
-    }
-    onSetFilter = (filterBy) => {
-        this.setState({ filterBy })
-    }
-    getBoardForDisplay = () => {
-        const { filterBy, board } = this.state
-        var copyBoard = JSON.parse(JSON.stringify(board))
-        if (filterBy) {
-            if (filterBy.status.length) {
-                copyBoard.groups = copyBoard.groups.filter(group => {
-                    const filteredCards = group.cards.filter(card => {
-                        const status = filterBy.status.find(label => {
-                            return card.status.text === label
-                        });
-                        if (!status) return false
-                        return true
-                    })
-                    if (filteredCards.length) {
-                        group.cards = filteredCards
-                        return true
-                    }
-                    return false
-                })
-            }
-            if (filterBy.priority.length) {
-                copyBoard.groups = copyBoard.groups.filter(group => {
-                    const filteredCards = group.cards.filter(card => {
-                        const priority = filterBy.priority.find(label => {
-                            return card.priority.text === label
-                        });
-                        if (!priority) return false
-                        return true
-                    })
-                    if (filteredCards.length) {
-                        group.cards = filteredCards
-                        return true
-                    }
-                    return false
-                })
-            }
-            if (filterBy.membersId.length) {
-                copyBoard.groups = copyBoard.groups.filter(group => {
-                    const filteredCards = group.cards.filter(card => {
-                        const member = card.members.find(member => {
-                            return (filterBy.membersId.includes(member._id))
-                        })
-                        if (!member) return false
-                        return true
-                    })
-                    if (filteredCards.length) {
-                        group.cards = filteredCards
-                        return true
-                    }
-                    return false
-                })
-            }
-            if (filterBy.sortBy && !this.props.onDrag) {
-                if (filterBy.sortBy === 'name') copyBoard.groups = boardService.sortByTitle(copyBoard.groups)
-                else copyBoard.groups = boardService.sortByDate(copyBoard.groups)
-            }
-            const filterRegex = new RegExp(filterBy.txt, 'i');
-            copyBoard.groups = copyBoard.groups.filter(group => {
-                const filteredCards = group.cards.filter(card => filterRegex.test(card.title))
-                if (filteredCards.length) {
-                    group.cards = filteredCards
-                    return true
-                } else return false
-                    || filterRegex.test(group.title)
-            })
-        }
-        return copyBoard
-    }
-    render() {
-        const { loggedInUser, onDrag, board } = this.props
-        const { isShowDashboard } = this.state
-        const filteredBoard = this.getBoardForDisplay()
-        return (
-            <>
-                <BoardHeader user={loggedInUser} board={board} onAddGroup={this.onAddGroup} changeBoardView={this.changeBoardView} onChangeTitle={this.onChangeTitle}
-                    onChangeBoardMemebrs={this.onChangeBoardMemebrs} onSetFilter={this.onSetFilter} />
-                {isShowDashboard && <DashBoard board={board} />}
-                {!isShowDashboard && <DragDropContext onDragEnd={this.onDragEnd} onDragStart={this.onDragStart}>
-                    <Droppable droppableId={board._id} isCombineEnabled type='group'>
-                        {(provided) => (
-                            <div className="main-groups-container" ref={provided.innerRef}
-                                {...provided.droppableProps}>
-                                {provided.placeholder}
-                                <div className="groups-container flex column">
-                                    {filteredBoard.groups.map((group, idx) => <GroupPreview
-                                        key={group.id} group={group}
-                                        onDrag={onDrag}
-                                        onAddCard={this.onAddCard} board={board} onRemoveGroup={this.onRemoveGroup}
-                                        onChangeGroupTitle={this.onChangeGroupTitle} onChangeGroupColor={this.onChangeGroupColor}
-                                        idx={idx} />)}
-                                </div>
-                            </div>
-                        )}
-                    </Droppable>
-                </DragDropContext>}
-            </>
-        )
-    }
-}
-const mapGlobalStateToProps = (state) => {
-    return {
-        loggedInUser: state.userReducer.loggedInUser,
-        onDrag: state.boardReducer.onDrag,
-        board: state.boardReducer.board
-    }
-}
-const mapDispatchToProps = {
-    loadBoards,
-    addCard,
-    addGroup,
-    changeBoardTitle,
-    onChangeGroupTitle,
-    changeBoardMemebrs,
-    changeGroupColor,
-    removeGroup,
-    changeGroupIdx,
-    changeCardIdx,
-    getKeyById,
-    setMsg,
-    onDragStart,
-    onDragEnd
-}
-export const BoardPreview = connect(mapGlobalStateToProps, mapDispatchToProps)(_BoardPreview)
+    return boardCopy;
+  }, [filterBy, board]);
+  return (
+    <div className='board-preview-container'>
+      <BoardHeader
+        loggedInUser={loggedInUser}
+        board={board}
+        boardMembers={boardMembers}
+        onAddGroup={onAddGroup}
+        changeBoardView={changeBoardView}
+        onChangeTitle={onChangeTitle}
+        onChangeBoardMemebrs={onChangeBoardMemebrs}
+        onSetFilter={onSetFilter}
+      />
+      {/* {isShowDashboard && <DashBoard board={board} />} */}
+      {!isShowDashboard && (
+        <DragDropContext onDragEnd={onDragEnd} onDragStart={onDragStart}>
+          <div className='main-groups-container'>
+            <Droppable droppableId={board._id} isCombineEnabled type='group'>
+              {(provided) => (
+                <div ref={provided.innerRef} {...provided.droppableProps}>
+                  {!filteredBoard.groups.length ? (
+                    <NoResultsPlaceholder msg='No results were found...' />
+                  ) : (
+                    filteredBoard.groups.map((group, idx) => (
+                      <GroupPreview
+                        key={group.id}
+                        group={group}
+                        onDrag={onDrag}
+                        onAddCard={onAddCard}
+                        board={board}
+                        onRemoveGroup={onRemoveGroup}
+                        onChangeGroupTitle={onChangeGroupTitle}
+                        idx={idx}
+                      />
+                    ))
+                  )}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </div>
+        </DragDropContext>
+      )}
+    </div>
+  );
+};

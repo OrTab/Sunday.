@@ -17,6 +17,7 @@ export const boardService = {
     updateTaskMembers,
     changeCardDates,
     changeCardLabels,
+    deleteLabel,
     changeGroupColor,
     removeGroup,
     changeBoardMemebrs,
@@ -29,7 +30,7 @@ export const boardService = {
     updateActivities,
     deepSearchByKey,
     getKeyById,
-    addCardUpdate
+    addCardUpdate,
 
 }
 
@@ -38,17 +39,17 @@ function getKeyById(source, target) {
 
     const sourceSet = new Set()
     return findTarget(source, target)
-    
+
     function findTarget(source, target) {
-        
-    
+
+
         if (!source) {
             sourceSet.clear()
             return
         }
 
         if (sourceSet.has(source)) {
-          
+
             sourceSet.clear()
             return
         }
@@ -113,7 +114,6 @@ async function query(userId) {
 
     try {
         var queryStr = (!userId) ? '' : `?userId=${userId}`
-
         return httpService.get(`board${queryStr}`)
     } catch (err) {
         throw new Error('couldn\'t find boards')
@@ -133,21 +133,20 @@ async function removeBoard(boardId) {
 }
 
 function getBoardIdByIdx(boardIdx, boards) {
-
-    let currBoardId = (!boardIdx && boards.length) ? boards[boardIdx]._id : boards[boardIdx - 1]?._id
+    const currBoardId = (!boardIdx && boards.length) ? boards[1]?._id : boards[boardIdx - 1]?._id
     return currBoardId
 }
 
 
 
-async function addBoard(boardTitle, user) {
+async function addBoard(boardTitle, userId) {
     try {
         const boardToAdd = {
             title: boardTitle,
-            createdBy: {},
-            members: [],
+            createdBy: userId,
+            members: [userId],
             activities: [],
-            groups: [_createDefaultGroup(user)]
+            groups: [_createDefaultGroup(userId)]
         }
         // return await storageService.post('boards', boardToAdd)
         return httpService.post('board', boardToAdd)
@@ -156,7 +155,7 @@ async function addBoard(boardTitle, user) {
 
     }
 }
-
+//TODO: use recursion func
 function _findGroupById(board, groupId) {
     const group = board.groups.find(group => groupId === group.id)
     return group
@@ -164,14 +163,14 @@ function _findGroupById(board, groupId) {
 
 async function addCard({ board, groupId, cardTitle, user }) {
     try {
-        const boardToUpdate = JSON.parse(JSON.stringify(board))
+        const boardToUpdate = { ...board }
         const groupToUpdate = _findGroupById(boardToUpdate, groupId)
         const activityText = `added a new card : ${cardTitle}, to group : ${groupToUpdate.title}`
         const activity = _createBoardActivity(user, activityText)
         boardToUpdate.activities = [activity, ...boardToUpdate.activities]
-        groupToUpdate.cards = [...groupToUpdate.cards, (_createCard(cardTitle, user))]
-        const groups = boardToUpdate.groups.map(group => group.id === groupToUpdate.id ? groupToUpdate : group)
-        boardToUpdate.groups = groups
+        // groupToUpdate.cards.push(_createCard(cardTitle, user._id))
+        groupToUpdate.cards = [...groupToUpdate.cards, (_createCard(cardTitle, user._id))]
+        boardToUpdate.groups = boardToUpdate.groups.map(group => group.id === groupToUpdate.id ? groupToUpdate : group)
         httpService.put('board', boardToUpdate)
         return boardToUpdate
     } catch (err) {
@@ -182,13 +181,13 @@ async function addCard({ board, groupId, cardTitle, user }) {
 
 async function addGroup(board, user) {
     try {
+        const boardToUpdate = { ...board }
         const activityText = `added a new group`
         const activity = _createBoardActivity(user, activityText)
-        const boardToUpdate = JSON.parse(JSON.stringify(board))
         boardToUpdate.activities = [activity, ...boardToUpdate.activities]
-        const newGroup = _createDefaultGroup(user);
-        boardToUpdate.groups = [newGroup, ...boardToUpdate.groups]
-         httpService.put('board', boardToUpdate)
+        const newGroup = _createDefaultGroup(user._id);
+        boardToUpdate.groups.unshift(newGroup)
+        httpService.put('board', boardToUpdate)
         return boardToUpdate
     } catch (err) {
         throw err
@@ -197,18 +196,15 @@ async function addGroup(board, user) {
 
 async function deleteCard({ board, groupId, cardId, user }) {
     try {
-        const boardToUpdate = JSON.parse(JSON.stringify(board))
+        const boardToUpdate = { ...board }
         const groupToUpdate = _findGroupById(boardToUpdate, groupId)
         const activityText = `deleted a card in group : ${groupToUpdate.title}`
         const activity = _createBoardActivity(user, activityText)
         boardToUpdate.activities = [activity, ...boardToUpdate.activities]
 
-        const cards = groupToUpdate.cards.filter(card => card.id !== cardId)
-        groupToUpdate.cards = cards
-        const groups = boardToUpdate.groups.map(group => group.id === groupToUpdate.id ? groupToUpdate : group)
-        boardToUpdate.groups = groups
-
-         httpService.put('board', boardToUpdate)
+        groupToUpdate.cards = groupToUpdate.cards.filter(card => card.id !== cardId)
+        boardToUpdate.groups = boardToUpdate.groups.map(group => group.id === groupToUpdate.id ? groupToUpdate : group)
+        httpService.put('board', boardToUpdate)
         return boardToUpdate
     } catch (err) {
         throw err
@@ -217,17 +213,17 @@ async function deleteCard({ board, groupId, cardId, user }) {
 
 async function changeBoardTitle(newTitle, board, user) {
 
-    const boardToUpdate = JSON.parse(JSON.stringify(board))
+    const boardToUpdate = { ...board }
     const activityText = `changed board title from '${boardToUpdate.title}' to '${newTitle}'`
     const activity = _createBoardActivity(user, activityText)
     boardToUpdate.activities = [activity, ...boardToUpdate.activities]
     boardToUpdate.title = newTitle
-     httpService.put('board', boardToUpdate)
+    httpService.put('board', { boardToUpdate, isChangeBoardName: true })
     return boardToUpdate
 }
 
 function sortByTitle(groupsToSort) {
-    groupsToSort = groupsToSort.sort((group1, group2) => {
+    groupsToSort.sort((group1, group2) => {
         if (group1.title.toLowerCase() > group2.title.toLowerCase()) return 1
         else if (group1.title.toLowerCase() < group2.title.toLowerCase()) return -1;
         else return 0;
@@ -236,7 +232,7 @@ function sortByTitle(groupsToSort) {
 }
 
 function sortByDate(groupsToSort) {
-    groupsToSort = groupsToSort.sort((group1, group2) => {
+    groupsToSort.sort((group1, group2) => {
         return group2.createdAt - group1.createdAt
     })
     return groupsToSort
@@ -280,14 +276,14 @@ async function changeGroupColor(color, board, groupId) {
 
 async function removeGroup(board, groupToUpdate, user) {
     try {
-        const boardToUpdate = JSON.parse(JSON.stringify(board))
+        const boardToUpdate = { ...board }
         const activityText = `removed group ${groupToUpdate.title}`
         const activity = _createBoardActivity(user, activityText)
         boardToUpdate.activities = [activity, ...boardToUpdate.activities]
 
         const groups = boardToUpdate.groups.filter(group => group.id !== groupToUpdate.id)
         boardToUpdate.groups = groups
-         httpService.put('board', boardToUpdate)
+        httpService.put('board', boardToUpdate)
         return boardToUpdate
 
     } catch (err) {
@@ -297,17 +293,14 @@ async function removeGroup(board, groupToUpdate, user) {
 }
 
 async function changeGroupIdx(board, result) {
-    const { destination, source } = result
     try {
-        const boardToUpdate = JSON.parse(JSON.stringify(board))
-        const newGroups = boardToUpdate.groups.map((group, idx, groups) => {
-            if (idx === source.index) return groups[destination.index]
-            if (idx === destination.index) return groups[source.index]
-            else return group
-        })
-        boardToUpdate.groups = newGroups;
-        httpService.put('board', boardToUpdate)
-        return boardToUpdate
+
+        // console.log(board);
+        // const sourceGroup = boardToUpdate.groups[source.index]
+        // boardToUpdate.groups[source.index] = boardToUpdate.groups[destination.index]
+        // boardToUpdate.groups[destination.index] = sourceGroup
+        // console.log(boardToUpdate.groups);
+        return await httpService.put('board', board)
     } catch (err) {
         throw err
     }
@@ -325,7 +318,7 @@ async function changeCardIdx(boardToUpdate, result) {
 
 async function changeGroupTitle({ board, groupId, groupTitle, user }) {
     try {
-        const boardToUpdate = JSON.parse(JSON.stringify(board))
+        const boardToUpdate = { ...board }
         let prevTitle = ''
 
         const groups = boardToUpdate.groups.map(group => {
@@ -346,32 +339,32 @@ async function changeGroupTitle({ board, groupId, groupTitle, user }) {
     }
 }
 
-function updateTaskMembers(memberId, sign, board, cardToUpdate, groupId, user) {
+function updateTaskMembers(member, sign, board, cardToUpdate, groupId, user) {
     try {
-        const boardToUpdate = JSON.parse(JSON.stringify(board))
+        const boardToUpdate = { ...board }
         const groupToUpdate = _findGroupById(boardToUpdate, groupId)
-        const member = boardToUpdate.members.find(member => member._id === memberId)
-        var cards;
-        var activityText;
-        var notificationTxt;
+        // const member = boardToUpdate.members.find(memberId => memberId === memberIdToUpdate)
+        let cards;
+        let activityText;
+        let notificationTxt;
 
         if (sign === 'remove') {
-            activityText = `removed ${member.fullname} from card '${cardToUpdate.title}' `
-            if (memberId !== user._id) notificationTxt = `${user.fullname} removed you from card '${cardToUpdate.title}' in group : ${groupToUpdate.title}`
+            activityText = `removed ${member._id === user._id ? 'yourself' : member.fullname} from card '${cardToUpdate.title}' `
+            if (member._id !== user._id) notificationTxt = `${user.fullname} removed you from card '${cardToUpdate.title}' in group : ${groupToUpdate.title}`
             cards = groupToUpdate.cards.map(card => {
                 if (cardToUpdate.id === card.id) {
-                    const members = card.members.filter(member => memberId !== member._id)
+                    const members = card.members.filter(memberId => memberId !== member._id)
                     card.members = members
                     return card
                 } else return card
             })
         }
         else {
-            activityText = `added ${member.fullname} to card '${cardToUpdate.title}'`
-            if (memberId !== user._id) notificationTxt = `${user.fullname} added you to card '${cardToUpdate.title}' in group : ${groupToUpdate.title}`
+            activityText = `added ${member._id === user._id ? 'yourself' : member.fullname} to card '${cardToUpdate.title}'`
+            if (member._id !== user._id) notificationTxt = `${user.fullname} added you to card '${cardToUpdate.title}' in group : ${groupToUpdate.title}`
             cards = groupToUpdate.cards.map(card => {
                 if (cardToUpdate.id === card.id) {
-                    const members = [...card.members, member]
+                    const members = [...card.members, member._id]
                     card.members = members
                     return card
                 } else return card
@@ -384,29 +377,26 @@ function updateTaskMembers(memberId, sign, board, cardToUpdate, groupId, user) {
         const groups = boardToUpdate.groups.map(group => group.id === groupToUpdate.id ? groupToUpdate : group)
         boardToUpdate.groups = groups
         httpService.put('board', boardToUpdate)
-        if (notificationTxt) return { member, notificationTxt, user }
+        if (notificationTxt) return { memberId: member._id, notificationTxt, user, boardToUpdate }
+        else return { boardToUpdate }
     } catch (err) {
         throw err
     }
 
 }
+// TODO: think of better way to update the UI , also in changeCardTaskMembers
 function changeBoardMemebrs(memberData, board, type, user) {
-
-    const boardToUpdate = JSON.parse(JSON.stringify(board));
-    var activityText;
-    var notificationTxt;
-    var member
-
+    const boardToUpdate = { ...board }
+    var activityText
+    var notificationTxt
 
     if (type === 'remove') {
-        const membersToRemove = boardToUpdate.members.find(member => member._id === memberData)
-        if (memberData !== user._id) notificationTxt = `${user.fullname} remove you from '${board.title}' `
-        member = boardToUpdate.members.find(member => member._id === memberData)
-        activityText = `removed ${membersToRemove.fullname} from this board`
-        boardToUpdate.members = boardToUpdate.members.filter(member => member._id !== memberData)
+        if (memberData._id !== user._id) notificationTxt = `${user.fullname} removed you from '${board.title}' `
+        activityText = `removed ${memberData.fullname} from this board`
+        boardToUpdate.members = boardToUpdate.members.filter(memberId => memberId !== memberData._id)
         boardToUpdate.groups = boardToUpdate.groups.map(group => {
             group.cards = group.cards.map(card => {
-                card.members = card.members.filter(member => member._id !== memberData);
+                card.members = card.members.filter(memberId => memberId !== memberData._id);
                 return card
             })
             return group;
@@ -415,35 +405,58 @@ function changeBoardMemebrs(memberData, board, type, user) {
     } else {
         activityText = `added ${memberData.fullname} to this board`
         if (memberData._id !== user._id) notificationTxt = `${user.fullname} add you to '${board.title}'`
-        member = { ...memberData }
-        const newMembers = [...boardToUpdate.members, memberData];
-        boardToUpdate.members = newMembers
+        boardToUpdate.members = [...boardToUpdate.members, memberData._id];
     }
     const activity = _createBoardActivity(user, activityText)
     boardToUpdate.activities = [activity, ...boardToUpdate.activities]
     httpService.put('board', boardToUpdate)
-    if (notificationTxt) return { member, notificationTxt, user }
-    // if (notificationTxt) return { member: user, notificationTxt, user: memberData }
-
+    if (notificationTxt) return { memberId: memberData._id, notificationTxt, user, boardToUpdate }
+    return { boardToUpdate }
 }
 
-async function changeCardLabels(board, cardToUpdate, groupId, label, labelType, user) {
+async function changeCardLabels({ board, cardToUpdate, groupId, label, labelType, user, labelGroup }) {
     try {
-        const boardToUpdate = JSON.parse(JSON.stringify(board))
+        const boardToUpdate = { ...board }
         const groupToUpdate = _findGroupById(boardToUpdate, groupId)
         const activityText = `updated ${labelType} in card '${cardToUpdate.title}' from '${cardToUpdate[labelType].text}' to '${label.text}'`
         const activity = _createBoardActivity(user, activityText)
         boardToUpdate.activities = [activity, ...boardToUpdate.activities]
-
-        const cards = groupToUpdate.cards.map(card => {
+        groupToUpdate[labelGroup].forEach(currLabel => {
+            if (currLabel.id === label.id) currLabel.isActive = true
+            if (cardToUpdate[labelType].id === currLabel.id) currLabel.isActive = false
+        })
+        groupToUpdate.cards.forEach(card => {
             if (cardToUpdate.id === card.id) {
                 card[labelType] = label;
                 return card
             } else return card
         })
-        groupToUpdate.cards = cards
         const groups = boardToUpdate.groups.map(group => group.id === groupToUpdate.id ? groupToUpdate : group)
         boardToUpdate.groups = groups
+        httpService.put('board', boardToUpdate)
+        return boardToUpdate
+    } catch (err) {
+        throw err
+    }
+}
+
+
+async function deleteLabel({ board, groupId, labelId, labelGroup, cardDetails }) {
+    try {
+        const boardToUpdate = JSON.parse(JSON.stringify(board))
+        boardToUpdate.groups = boardToUpdate.groups.map(group => {
+            if (group.id === groupId) {
+                group[labelGroup] = group[labelGroup].filter(label => label.id !== labelId)
+                group.cards = group.cards.map(card => {
+                    if (card[cardDetails.labelType].id === labelId) {
+                        card[cardDetails.labelType] = cardDetails.label
+                        return card
+                    } else return card
+                })
+
+                return group
+            } else return group
+        })
         httpService.put('board', boardToUpdate)
         return boardToUpdate
     } catch (err) {
@@ -474,23 +487,23 @@ async function addCardUpdate(cardUpdate, board, cardToUpdate) {
         return httpService.put('board', boardToUpdate)
 
     } catch (err) {
-        // console.log(err);
+        throw err
     }
 }
 
 
 async function addCardLabel(board, groupId, label, labelGroup) {
     try {
-        const groups = board.groups.map(group => {
+        const boardToUpdate = { ...board }
+        boardToUpdate.groups = boardToUpdate.groups.map(group => {
             if (group.id === groupId) {
-                const groupToUpdate = { ...group }
-                groupToUpdate[labelGroup] = [...groupToUpdate[labelGroup], label];
-                return groupToUpdate;
+                group[labelGroup] = [...group[labelGroup], { ...label }];
+                return group;
             } else return group;
         })
-        board.groups = groups
-         httpService.put('board', board)
-        return board
+        httpService.put('board', boardToUpdate)
+        return boardToUpdate
+
     } catch (err) {
         throw err
     }
@@ -498,23 +511,19 @@ async function addCardLabel(board, groupId, label, labelGroup) {
 
 async function changeCardTitle({ board, groupId, cardToUpdate, cardTitle, user }) {
     try {
-        const boardToUpdate = JSON.parse(JSON.stringify(board))
+        const boardToUpdate = { ...board }
         const groupToUpdate = _findGroupById(boardToUpdate, groupId)
         const activityText = `changed card title from ${cardToUpdate.title} to ${cardTitle}`
         const activity = _createBoardActivity(user, activityText)
         boardToUpdate.activities = [activity, ...boardToUpdate.activities]
 
-
-        const cards = groupToUpdate.cards.map(card => {
+        groupToUpdate.cards = groupToUpdate.cards.map(card => {
             if (card.id === cardToUpdate.id) {
                 card.title = cardTitle
                 return card
             } else return card
         })
-        groupToUpdate.cards = cards
-        const groups = boardToUpdate.groups.map(group => group.id === groupToUpdate.id ? groupToUpdate : group)
-        boardToUpdate.groups = groups
-        // return await storageService.put('boards', board)
+        boardToUpdate.groups = boardToUpdate.groups.map(group => group.id === groupToUpdate.id ? groupToUpdate : group)
         return httpService.put('board', boardToUpdate)
     } catch (err) {
         console.log(err);
@@ -553,33 +562,21 @@ function updateActivities(board, isClear) {
 
 function _createBoardActivity(user, txt) {
     return {
-        "id": utilService.makeId(),
+        id: utilService.makeId(),
         txt,
         isRead: false,
-        "createdAt": Date.now(),
-        "byMember": {
-            "_id": user._id,
-            "fullname": user.fullname,
-            "imgUrl": user.imgUrl ? user.imgUrl : null
-        }
+        createdAt: Date.now(),
+        byMember: user._id
     }
 
 }
 
-
-
-function _createCard(cardTitle, user) {
+function _createCard(cardTitle, userId) {
     return {
         id: utilService.makeId(),
         title: cardTitle,
         updates: [],
-        members: [
-            {
-                "_id": user._id,
-                "fullname": user.fullname,
-                "imgUrl": user.imgUrl ? user.imgUrl : null
-            }
-        ],
+        members: [userId],
         status:
             { text: 'No status yet', color: '#cccccc', id: utilService.makeId() },
         priority:
@@ -589,37 +586,30 @@ function _createCard(cardTitle, user) {
             startDate: '',
             endDate: ''
         },
-        createdBy: {
-            _id: user._id,
-            fullname: user.fullname,
-            imgUrl: user.imgUrl ? user.imgUrl : null
-        },
+        createdBy: userId
     }
 }
 
-function _createDefaultGroup(user) {
+function _createDefaultGroup(userId) {
     return {
         id: utilService.makeId(),
         title: "New group",
-        createdBy: {
-            "_id": user._id,
-            "fullname": user.fullname,
-            "imgUrl": user.imgUrl ? user.imgUrl : null
-        },
+        createdBy: userId,
         createdAt: Date.now(),
         statuses: [
-            { text: 'Done', color: '#00ca72', id: utilService.makeId() },
-            { text: 'Stuck', color: '#fb275d', id: utilService.makeId() },
-            { text: 'Working on it', color: '#ffcc00', id: utilService.makeId() }
+            { text: 'Done', color: '#00ca72', id: utilService.makeId(), isActive: false },
+            { text: 'Stuck', color: '#fb275d', id: utilService.makeId(), isActive: false },
+            { text: 'Working on it', color: '#ffcc00', id: utilService.makeId(), isActive: false }
         ],
         priorities: [
-            { text: 'Low', color: '#6bf1b9', id: utilService.makeId() },
-            { text: 'Medium', color: '#6b97f1', id: utilService.makeId() },
-            { text: 'High', color: '#ff812f', id: utilService.makeId() },
-            { text: 'Urgent', color: '#ff2f2f', id: utilService.makeId() }
+            { text: 'Low', color: '#6bf1b9', id: utilService.makeId(), isActive: false },
+            { text: 'Medium', color: '#6b97f1', id: utilService.makeId(), isActive: false },
+            { text: 'High', color: '#ff812f', id: utilService.makeId(), isActive: false },
+            { text: 'Urgent', color: '#ff2f2f', id: utilService.makeId(), isActive: false }
         ],
+        cardOrder: ['members', 'status', 'date', 'workingDays', 'priority'],
         cards: [
-            _createCard('New item', user)
+            _createCard('New item', userId)
         ],
         style: { color: "#0085ff" }
     }

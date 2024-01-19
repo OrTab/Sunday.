@@ -54,14 +54,10 @@
         border: 1px solid $blue;
         background-color: unset;
     }
-    & .clean-input-btn {
-        // background-color: $blue;
-        // border: none;&
-        // background: none;&
-    }
 }
 .groups-filter {
     position: absolute;
+    @include scrollbars(8px, #afafaf);
     right: 100%;
     margin-top: 45px;
     border-radius: 3px;
@@ -69,7 +65,7 @@
     box-shadow: 0px 0px 10px 0px rgba(50, 50, 50, 0.1);
     padding: 15px;
     color: $black;
-    z-index: 999;
+    z-index: 20;
     display: flex;
     gap: 10px;
 
@@ -78,6 +74,7 @@
         max-height: 250px;
         @include scrollbars(8px, #afafaf);
         overflow-y: auto;
+        overflow-x: hidden;
         width: rem(175px);
 
         & .item {
@@ -147,6 +144,7 @@
         margin-left: 10px;
     }
     .board-filter-wrapper-mobile {
+        position: absolute;
         display: block;
     }
     .board-filter-wrapper-desktop {
@@ -156,6 +154,16 @@
     .groups-filter {
         flex-direction: column;
         margin-top: -75px;
-        right: 115%;
+        right: 0%;
+        top: 85px;
+        box-shadow: 0px 0px 12px 0px rgba(50, 50, 50, 0.329);
+        max-height: 320px;
+        overflow-y: auto;
+        & .option-continer {
+            max-height: 185px;
+            & .item {
+                height: 34px;
+            }
+        }
     }
 }

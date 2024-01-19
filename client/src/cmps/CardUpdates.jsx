@@ -10,6 +10,7 @@ import { utilService } from '../services/utilService.js';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import moment from 'moment';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
+import { ClickAwayListener } from '@material-ui/core';
 
 class _CardUpdates extends Component {
     state = {
@@ -29,7 +30,6 @@ class _CardUpdates extends Component {
             this.getCard(cardId)
             this.setState({ isOpen: true })
         }
-        // else <Redirect to="/bo/>
 
     }
 
@@ -138,9 +138,10 @@ class _CardUpdates extends Component {
 
         }, '')
         return (
-            <>
-                <section className={`card-updates open   `}>
+            <ClickAwayListener onClickAway={()=>this.props.history.push(`/board/${board._id}`)}>
+                <section className={`card-updates open`}>
                     <Link className="back-arrow" to={`/board/${board._id}`} onClick={() => this.setState({ isOpen: false })}><ArrowBackIcon /></Link>
+                    <small className="created-at">Created at : {new Date(card.createdAt).toDateString()}</small>
                     <div className="updates-card-header flex align-center space-between">
                         <h2 className="card-update-title">{this.state.card.title}</h2>
                         <span className="card-status" style={{ backgroundColor: card.status.color }}>{card.status.text}</span>
@@ -178,7 +179,7 @@ class _CardUpdates extends Component {
                         <div dangerouslySetInnerHTML={{ __html: htmlUpdates }} />
                     </div>
                 </section>
-            </>
+            </ClickAwayListener>
         )
 
     }

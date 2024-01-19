@@ -21,6 +21,12 @@
     font-size: rem(30px);
 }
 
+.p-m2 {
+    * {
+        margin: 0 2px;
+    }
+}
+
 // flex helpers
 
 .flex {
@@ -52,6 +58,9 @@
     &.align-flex-end {
         align-items: flex-end;
     }
+}
+.grow {
+    flex-grow: 1;
 }
 .absolute {
     position: absolute;
@@ -86,19 +95,21 @@
 }
 
 .editable-element {
+    // width: fit-content;
+    // width: 100%;
     display: inline-block;
     padding: 0 2px;
     cursor: text;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    // text-overflow: ellipsis;
+    // white-space: nowrap;
     overflow: hidden;
     &:hover {
-        outline: 1.5px dashed #3333338c;
+        outline: 1px dashed #3333338c;
     }
 
     &:focus {
         text-overflow: clip;
-        outline: 2px dashed #333333bb;
+        outline: 1px dashed #000000e7;
     }
 }
 
@@ -119,20 +130,20 @@
 
     & input {
         background-color: rgba(255, 255, 255, 0);
-        width: 100px;
+        width: 110px;
         padding: 5px 5px 5px 30px;
         border: none;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         border-radius: 3px;
-        transition: all 0.2s ease;
         height: 100%;
         &:hover {
             background-color: $lightgrey;
         }
-
+        
         &:focus {
+            transition: all 0.4s ease;
             width: 100%;
             border: 1px solid $blue;
             &:hover {

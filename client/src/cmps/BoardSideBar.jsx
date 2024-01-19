@@ -1,9 +1,11 @@
 import AddIcon from '@material-ui/icons/Add';
 import { Component } from 'react'
-import { BoardSearch } from './BoardSearch';
+import {  SearchInput } from './SearchInput';
 import { TextField } from '@material-ui/core';
 import HomeIcon from '@material-ui/icons/Home';
 import { BoardSideBarItem } from './BoardSideBarItem';
+import RemoveIcon from '@material-ui/icons/Remove';
+
 
 export class BoardSideBar extends Component {
 
@@ -15,8 +17,8 @@ export class BoardSideBar extends Component {
     }
 
 
-    onInputChange = (ev) => {
-        const value = ev.target.value;
+    onInputChange = ({ target }) => {
+        const { value } = target;
         this.setState({ boardTitle: value });
     };
 
@@ -45,8 +47,9 @@ export class BoardSideBar extends Component {
                     <span>Main workspace</span>
                 </div>
                 <div className="board-sidebar-controlles">
-                    <BoardSearch onSetFilter={onSetFilter} />
-                    {!this.state.isAddBoard && <span className="board-sidebar-action-btn" onClick={this.toggleEditBoard}><AddIcon />Add</span>}
+                    <SearchInput onSetFilter={onSetFilter} placeHolder='boards' />
+                    <span className="board-sidebar-action-btn" onClick={this.toggleEditBoard}>{!this.state.isAddBoard ? <> <AddIcon />Add</> : <> <RemoveIcon />Close</>}</span>
+
                     {this.state.isAddBoard &&
                         <form onSubmit={this.onAddBoard}>
                             <TextField placeholder=" Board Name" autoFocus type="text" autoComplete="off"
@@ -57,6 +60,7 @@ export class BoardSideBar extends Component {
                 <div>
                     <h3 className="board-sidebar-title" >My boards</h3>
                     <div>
+                        {!boards.length&&<div>No Boards..</div>}
                         {boards.map((board, idx) => {
                             return <BoardSideBarItem
                                 key={board._id}

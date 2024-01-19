@@ -2,50 +2,51 @@ import 'react-dates/initialize';
 import 'react-dates/lib/css/_datepicker.css';
 import { DayPickerRangeController } from 'react-dates';
 
-import React, { Component } from 'react'
+import { useEffect, useState } from 'react'
 
-export class DatePicker extends Component {
+export const DatePicker = ({ closeDatePicker, changeDates }) => {
 
-  state = {
-    startDate: null,
-    endDate: null,
-    focusedInput: 'startDate'
-  }
+  const [dates, setDates] = useState({ startDate: null, endDate: null })
+  const [focusedInput, setFocusedInput] = useState('startDate')
+  const [isStartDateOnly, setIsStartDateOnly] = useState(false)
 
-  handleChange = () => {
-    const { startDate, endDate, focusedInput } = this.state
-    if (startDate?._d && endDate?._d) this.props.changeDates({ startDate: startDate?._d, endDate: endDate?._d })
-    if (startDate?._d && !endDate?._d && !focusedInput) {
-      this.props.changeDates({ startDate: startDate?._d, endDate: null })
+  const handleChange = () => {
+    if (dates.startDate?._d && dates.endDate?._d) changeDates({ startDate: dates.startDate?._d, endDate: dates.endDate?._d })
+    if (dates.startDate?._d && !dates.endDate?._d && !focusedInput) {
+      changeDates({ startDate: dates.startDate?._d, endDate: null })
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    const { startDate, endDate, focusedInput } = this.state
-    if (startDate?._d && !endDate?._d && !focusedInput) {
-      this.props.changeDates({ startDate: startDate?._d, endDate: null })
+  useEffect(() => {
+    if (dates.startDate?._d && !dates.endDate?._d && isStartDateOnly) {
+      changeDates({ startDate: dates.startDate?._d, endDate: null })
+      setIsStartDateOnly(false)
     }
-  }
 
+    if (!focusedInput) closeDatePicker()
 
-  render() {
-    const { /* startDate, endDate, cardId, */ closeDatePicker } = this.props
-    return (
-      <div className="datePicker">
-          <DayPickerRangeController
-            startDate={this.state.startDate} // momentPropTypes.momentObj or null,
-            endDate={this.state.endDate} // momentPropTypes.momentObj or null,
-            isOutsideRange={() => false}
-            onDatesChange={({ startDate, endDate }) => this.setState({ startDate, endDate }, this.handleChange)}
-            focusedInput={this.state.focusedInput}
-            hideKeyboardShortcutsPanel={true}
-            onFocusChange={focusedInput => {
-              this.setState({ focusedInput })
-            }}
-          />
-          <button className="date-btn" onClick={()=>this.setState({focusedInput:null},closeDatePicker)}>Set</button>
+    handleChange()
+    return () => {
+    }
+  }, [dates, focusedInput,isStartDateOnly])
 
-      </div>
-    )
-  }
+  return (
+    <div className="datePicker">
+      <DayPickerRangeController
+        startDate={dates.startDate} // momentPropTypes.momentObj or null,
+        endDate={dates.endDate} // momentPropTypes.momentObj or null,
+        isOutsideRange={() => false}
+        onDatesChange={({ startDate, endDate }) => setDates({ startDate, endDate })}
+        focusedInput={focusedInput}
+        hideKeyboardShortcutsPanel={true}
+        onFocusChange={focusedInput => {
+          setFocusedInput(focusedInput)
+        }}
+      />
+      <button className="date-btn" onClick={() => setIsStartDateOnly(true)}>Set</button>
+
+    </div>
+  )
 }
+
+

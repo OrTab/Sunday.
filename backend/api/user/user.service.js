@@ -112,6 +112,10 @@ function _buildCriteria(filterBy) {
             }
         ]
     }
+    if (filterBy.usersIds) {
+        filterBy.usersIds = filterBy.usersIds.map(userId => ObjectId(userId))
+        criteria._id = { $in: filterBy.usersIds }
+    }
     return criteria
 }
 

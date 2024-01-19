@@ -1,10 +1,11 @@
 * {
     box-sizing: border-box;
+    @include scrollbars(8px, #afafaf);
 }
 
 body {
     margin: 0;
-    font-family: "Heebo", sans-serif;
+    font-family: "Roboto", sans-serif;
 }
 
 img {
@@ -35,7 +36,7 @@ ul {
 
 button {
     cursor: pointer;
-    font-family: "Heebo", sans-serif;
+    font-family: "Roboto", sans-serif;
     &:focus {
         outline: none;
     }
@@ -43,11 +44,22 @@ button {
 
 input,
 textarea {
-    font-family: "Heebo", sans-serif;
+    font-family: "Roboto", sans-serif;
 
     &:focus {
         outline: none;
     }
 }
 
+.loader-svg {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
 
+.no-results {
+    width: 100%;
+    text-align: center;
+    padding: 50px 20px 0;
+}
