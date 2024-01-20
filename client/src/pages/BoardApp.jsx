@@ -180,8 +180,12 @@ export const BoardApp = ({ match, history }) => {
         return boards.filter(board => filterRegex.test(board.title));
     };
 
-    if (!loggedInUser) return <Redirect exact to="/" />;
-    if (isLoading || action === 'add') return <Loader />;
+    if (!loggedInUser) {
+        return <Redirect exact to="/" />;
+    }
+    if (isLoading || action === 'add') {
+        return <Loader />;
+    }
     return (
         <div className="board-app-container">
             <MainSideBar
