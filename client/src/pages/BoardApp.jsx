@@ -97,13 +97,7 @@ export const BoardApp = ({ match, history }) => {
         }
     }, [boards.length]);
 
-    const initializeBoards = async () => {
-        if (!loggedInUser) {
-            history.push('/');
-            return;
-        }
-        dispatch({ type: 'SET_LOADING', isLoading: true });
-        const { boardId } = match.params;
+    const connectToSockets = () => {
         socketService.setup();
         socketService.emit('userSocket', loggedInUser);
         socketService.emit(
@@ -114,6 +108,12 @@ export const BoardApp = ({ match, history }) => {
         socketService.on('updateUser', updateUserInStore);
         socketService.on('userDataUpdate', onUpdateUserData);
         socketService.on('updateAllBoards', updateBoardsGenerally);
+    };
+
+    const initializeBoards = async () => {
+        connectToSockets();
+        dispatch({ type: 'SET_LOADING', isLoading: true });
+        const { boardId } = match.params;
         if (!boardId && !boards.length) {
             setAction('load');
             dispatch(loadBoards(loggedInUser._id));
@@ -141,7 +141,7 @@ export const BoardApp = ({ match, history }) => {
         // }))
         const members = await userService.getUsersById(board.members);
         dispatch(setBoardMembers(members));
-        setTimeout(dispatch, 1800, { type: 'SET_LOADING', isLoading: false });
+        setTimeout(dispatch, 1000, { type: 'SET_LOADING', isLoading: false });
     };
 
     const updateBoardsInStore = board => {
