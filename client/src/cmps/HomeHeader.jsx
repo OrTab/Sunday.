@@ -2,10 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import sunday from '../assets/img/sunday-logo.svg';
 import { NON_PRODUCT_ROUTES } from '../constants';
+import { useDispatch } from 'react-redux';
+import { checkLogin } from '../store/actions/userAction';
 
-export const HomeHeader = ({ checkGuestLogin }) => {
+export const HomeHeader = () => {
     const [isNavOpen, setIsNavOpen] = useState(false);
-
+    const dispatch = useDispatch();
+    const checkGuestLogin = () => {
+        dispatch(checkLogin({ username: 'or-tab', password: '12345678' }));
+    };
     useEffect(() => {
         window.addEventListener('scroll', handleScroll);
 

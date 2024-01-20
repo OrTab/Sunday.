@@ -11,7 +11,7 @@ export function Home() {
     };
     return (
         <div className="home-main-container">
-            <HomeHeader checkGuestLogin={checkGuestLogin} />
+            <HomeHeader />
             <div className="home-hero">
                 <div className="home-hero-inner">
                     <div className="home-hero-titles flex">
