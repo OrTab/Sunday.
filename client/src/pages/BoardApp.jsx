@@ -28,6 +28,7 @@ import { CardUpdates } from '../cmps/CardUpdates';
 import { Loader } from '../assets/img/Loader';
 import { NoResultsPlaceholder } from '../cmps/NoResultsPlaceholder';
 import { userService } from '../services/userService';
+import { utilService } from '../services/utilService';
 
 export const BoardApp = ({ match, history }) => {
     const [isBoardSideBarOpen, setIsBoardSideBarOpen] = useState(
@@ -141,7 +142,8 @@ export const BoardApp = ({ match, history }) => {
         // }))
         const members = await userService.getUsersById(board.members);
         dispatch(setBoardMembers(members));
-        setTimeout(dispatch, 1000, { type: 'SET_LOADING', isLoading: false });
+        await utilService.delay(1000);
+        dispatch({ type: 'SET_LOADING', isLoading: false });
     };
 
     const updateBoardsInStore = board => {
